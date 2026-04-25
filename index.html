@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Videy - Free and Simple Video Hosting</title>
+<link rel="icon" href="https://videy.co/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./src/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<div class="header-content">
+<a href="./" class="logo">videy</a>
+<button class="btn-upload-header" onclick="triggerUpload()">
+Upload
+</button>
+</div>
+</header>
+<main class="hero">
+<div class="hero-content">
+<h1 class="hero-title">
+Upload your videos
+<span class="hero-subtitle-text">and share</span>
+</h1>
+<p class="hero-description">
+Free and simple video hosting.
+</p>
+<button class="btn-upload-main" onclick="triggerUpload()">
+Upload Video
+</button>
+</div>
+</main>
+<form id="uploadForm">
+<input type="file" id="fileInput" hidden accept="video/mp4,video/quicktime">
+</form>
+<div id="uploadError" class="upload-error"></div>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+      <a href="javascript:void(0)" class="footer-link" onclick="openTerms()">Terms of Service</a> • <a href="javascript:void(0)" class="footer-link" onclick="openReport()">Report Abuse</a>
+      </div>
+    </footer>
+</div>
+<div id="uploadPopup" class="upload-popup" style="display:none;">
+    <div class="upload-popup-card">
+        <div class="loader-ring"></div>
+        <div class="upload-popup-text" id="uploadPopupText">
+            Uploading...
+        </div>
+    </div>
+</div>
+<div id="pageModal" class="page-modal" style="display:none;">
+    <div class="page-modal-card">
+        <button class="page-close-btn" onclick="closePageModal()">×</button>
+        <h2 id="pageModalTitle" class="page-modal-title"></h2>
+        <div id="pageModalContent" class="page-modal-content"></div>
+    </div>
+</div>
+<script src="./src/app.js"></script>
+<div id="pageModal" class="page-modal" style="display:none;">
+    <div class="page-modal-card">
+        <button class="page-close-btn" onclick="closePageModal()">×</button>
+        <h2 id="pageModalTitle" class="page-modal-title"></h2>
+        <div id="pageModalContent" class="page-modal-content"></div>
+    </div>
+</div>
+</body>
+</html>

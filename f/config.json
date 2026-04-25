@@ -1,0 +1,29 @@
+{
+  "categories": [
+    {
+      "name": "Smp",
+      "videos": [
+        {
+          "title": "Sample Videy",
+          "url": "MMgQETMk1"
+        },
+        {
+          "title": "MP4 CDN",
+          "url": "https://cdn.site.com/video.mp4"
+        },
+        {
+          "title": "XFREE",
+          "url": "a/b/c/video/full"
+        },
+        {
+          "title": "XXXFOLLOW",
+          "url": "123/456/789"
+        },
+        {
+          "title": "ACEIMG",
+          "url": "abcdef12345"
+        }
+      ]
+    }
+  ]
+}

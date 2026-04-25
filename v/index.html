@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Watch on Videy - Free and Simple Video Hosting</title>
+	<meta name="monetag" content="0e99d908bcdbc7216d806b51d5ef99c9">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="https://videy.co/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+	<link rel="stylesheet" href="../src/style.css">
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    height:100%;
+    margin:0;
+    padding:0;
+    background:#fff;
+    color:#111;
+    font-family:'Inter',Arial,sans-serif;
+}
+
+body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+}
+
+/* HEADER */
+.main-header{
+    width:100%;
+    padding:12px 0;
+    background:#fff;
+    border-bottom:1px solid #e5e7eb;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.header-container{
+    width:100%;
+    max-width:1170px;
+    margin:auto;
+    padding:0 15px;
+    display:flex;
+    align-items:center;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.header-title{
+    font-weight:700;
+    font-size:28px;
+}
+
+.header-upload-btn{
+    background:#f3f4f6;
+    color:#111;
+    text-decoration:none;
+    padding:9px 16px;
+    border-radius:16px;
+    font-size:14px;
+    font-weight:600;
+}
+
+/* PLAYER */
+.video-player-wrap{
+    width:100%;
+    padding-top:20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.player-row{
+    display:flex;
+    justify-content:center;
+    width:100%;
+}
+
+.video-box{
+    width:800px;
+    max-width:90vw;
+    aspect-ratio:16/9;
+    background:#fff;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 2px 16px rgba(0,0,0,.08);
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.video-box video{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    background:#fff;
+}
+
+.video-click-layer{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    z-index:5;
+}
+
+.play-overlay{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:80px;
+    height:80px;
+    background:rgba(0,0,0,.6);
+    border-radius:50%;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    pointer-events:none;
+}
+
+.play-overlay svg{
+    width:40px;
+    height:40px;
+    fill:#1e90ff;
+}
+
+/* ERROR */
+#video-error{
+    display:none;
+    text-align:center;
+    padding:20px;
+    color:#d00;
+    font-weight:600;
+}
+
+/* CTA */
+.video-actions{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    padding:18px 0 10px;
+}
+
+.download-btn{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(90deg,#667eea,#764ba2);
+    color:#fff;
+    border:none;
+    border-radius:24px;
+    padding:12px 24px;
+    font-size:18px;
+    font-weight:500;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    box-shadow:0 4px 14px rgba(102,126,234,.39);
+    transition:transform .2s ease, box-shadow .2s ease;
+    animation:pulseBtn 2s infinite;
+}
+
+.download-btn i{
+    margin-right:8px;
+}
+
+.download-btn::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-75%;
+    width:50%;
+    height:100%;
+    background:rgba(255,255,255,.45);
+    transform:skewX(-25deg);
+    animation:shineMove 2.2s infinite;
+}
+
+.download-btn:hover{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 6px 18px rgba(102,126,234,.45);
+}
+
+@keyframes shineMove{
+    0%{left:-75%}
+    100%{left:130%}
+}
+
+@keyframes pulseBtn{
+    0%,100%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.02);
+    }
+}
+
+footer{
+    margin-top:20px;
+    text-align:center;
+    color:gray;
+    padding-bottom:30px;
+}
+
+footer a{
+    text-decoration:none;
+    color:gray;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .video-box{
+        width:calc(100vw - 20px);
+        border-radius:8px;
+        box-shadow:none;
+    }
+
+    .header-title{
+        font-size:24px;
+    }
+}
+
+</style>
+</head>
+<body>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const gate = document.getElementById("ageGate");
+    if (!gate) return;
+
+    // kalau sudah pernah klik
+    if (localStorage.getItem("ageVerified") === "true") {
+        gate.style.display = "none";
+        document.body.style.overflow = "auto";
+    } else {
+        gate.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+
+});
+
+// ✅ GLOBAL FUNCTION (ANTI BLOCK)
+function confirmAge(){
+    const gate = document.getElementById("ageGate");
+
+    if(gate){
+        gate.style.display = "none";
+    }
+
+    document.body.style.overflow = "auto";
+
+    localStorage.setItem("ageVerified", "true");
+}
+
+// ❌ EXIT
+function exitAge(){
+    window.location.href = "https://omg10.com/4/10921975";
+}
+</script>
+<div id="ageGate" class="age-gate">
+  <div class="age-box">
+    <h2>🔞 Age Verification</h2>
+    <p>This content is restricted to adults (18+).</p>
+    <p>Are you 18 years or older?</p>
+
+    <div class="age-btns">
+      <button onclick="confirmAge()">Yes, I am 18+</button>
+      <button onclick="exitAge()">Leave</button>
+    </div>
+  </div>
+</div>
+<header class="main-header">
+<div class="header-content">
+<a href="../" class="logo">videy</a>
+<button class="btn-upload-header" onclick="triggerUpload()">
+Upload
+</button>
+</div>
+</header>
+
+    <div class="video-player-wrap">
+    <div class="ad-container-top">     
+    </div>
+      <!-- KODE BANNER -->
+    <div class="player-row">
+      <div class="ad-side"></div>
+      <div class="video-box" id="videoBox">
+        <video
+              id="video"
+              controls
+              controlsList="nodownload noplaybackrate"
+              oncontextmenu="return false;"
+              width="100%"
+              playsinline>
+              Your browser does not support the video tag.
+            </video>
+        <button
+            type="button"
+            class="video-click-layer"
+            id="firstClickLayer"
+            aria-label="Open video link">
+          </button>
+        <div class="play-overlay" id="playOverlay">
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <div id="videoLoading" class="text-white text-sm"></div>
+      </div>
+      <div class="ad-side"></div>
+    </div>
+
+    <div id="countdown-timer" style="display: none; margin-top: 12px; font-weight: bold; color: #d00; font-size: 18px;">
+      Redirecting in <span id="timer-value">60</span> seconds.
+    </div>
+    <div class="video-actions">
+<a class="download-btn" id="downloadBtn" href="#" target="_blank">
+        <i class="fa fa-download"></i> DOWNLOAD
+      </a>
+    </div>
+
+</div>
+
+    <!-- PERBAIKAN: Baris 1 yang mencetak '1' telah dihapus dari sini -->
+
+    <div id="playlistWrapper" class="playlist-wrapper" style="display: none;">
+      <div class="playlist-grid"></div>
+    </div>
+
+    <div class="ad-container-bottom"></div>
+  </div>    
+    
+      <div class="native-banner-wrap">
+              </div>
+      <div style="height:200px;"></div>
+    
+    <footer>
+    <div align="center">
+      Copyright © 2026<br>
+      <a href="javascript:void(0)" class="footer-link" onclick="openTerms()">Terms of Service</a> • <a href="javascript:void(0)" class="footer-link" onclick="openReport()">Report Abuse</a>  
+    </div>
+  </footer>
+
+<script>
+const video = document.getElementById("video");
+const videoError = document.getElementById("video-error");
+const videoActions = document.querySelector(".video-actions");
+const clickLayer = document.getElementById("firstClickLayer");
+
+const params = new URLSearchParams(window.location.search);
+
+// =========================
+// GET ID
+// =========================
+function getIdFromUrl() {
+    let path = window.location.pathname.replace(/^\/+|\/+$/g, "");
+    let idParam = params.get("id");
+
+    if (idParam) return idParam;
+    if (path) return path;
+
+    return "t4qLw89X1";
+}
+
+const id = getIdFromUrl();
+
+// =========================
+// LOAD VIDEO
+// =========================
+function loadVideo(src){
+    video.src = src;
+    video.load();
+}
+
+// =========================
+// DETECT SOURCE (AMAN)
+// =========================
+function detectSource(input){
+    if (!input) return null;
+
+    try {
+        input = decodeURIComponent(input);
+
+        // FULL URL
+        if (input.startsWith("http")) return input;
+
+        // PATH XXXFOLLOW
+        if (/^\d+\/\d+\/\d+(\.mp4)?$/.test(input)) {
+            if (!input.endsWith(".mp4")) input += ".mp4";
+            return "https://www.xxxfollow.com/media/fans/post_public/" + input;
+        }
+
+        // PATH XFREE
+        if (/^[a-z0-9]\/[a-z0-9]\/[a-z0-9]\/[^?]+\/full(\.mp4)?$/i.test(input)) {
+            if (!input.toLowerCase().endsWith(".mp4")) input += ".mp4";
+            return "https://cdn.xfree.com/xfree-prod/" + input;
+        }
+
+        // ACEIMG (HEX PANJANG)
+        if (/^[a-f0-9]{9,}$/i.test(input)) {
+            return "https://cdn.aceimg.com/" + input + ".mp4";
+        }
+
+        return null;
+
+    } catch (e) {
+        return null;
+    }
+}
+
+// =========================
+// VIDEY PLAYER (SIMPLE & STABIL)
+// =========================
+function playVidey(id){
+
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+    const cdn = isMobile
+        ? "https://cdn2.videy.co/"
+        : "https://cdn.videy.co/";
+
+    const base = cdn + id;
+
+    let step = 0;
+
+    video.onerror = function(){
+
+        step++;
+
+        if (step === 1) {
+            loadVideo(base + ".mp4#t=0.1");
+        } else if (step === 2) {
+            loadVideo(base + ".mov");
+        } else {
+            video.style.display = "none";
+            videoError.style.display = "block";
+            videoActions.style.display = "none";
+            if(clickLayer) clickLayer.style.display = "none";
+        }
+    };
+
+    loadVideo(base + ".mp4");
+}
+
+// =========================
+// MAIN
+// =========================
+const src = detectSource(id);
+
+if (src) {
+    loadVideo(src);
+
+    video.onerror = function () {
+        video.style.display = "none";
+        videoError.style.display = "block";
+        videoActions.style.display = "none";
+        if(clickLayer) clickLayer.style.display = "none";
+    };
+
+} else {
+    playVidey(id);
+}
+
+// =========================
+// SUCCESS
+// =========================
+video.oncanplay = function () {
+    videoError.style.display = "none";
+    video.style.display = "block";
+    videoActions.style.display = "flex";
+};
+
+// =========================
+// ADS
+// =========================
+(function(){
+    const directLink = "https://omg10.com/4/10921975";
+
+    if (!clickLayer) return;
+
+    clickLayer.addEventListener("click", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(directLink, "_blank");
+        clickLayer.remove();
+    }, { once: true });
+})();
+
+console.log("ID:", id);
+console.log("SRC:", src);
+</script>
+	
+<div id="uploadPopup" class="upload-popup" style="display:none;">
+    <div class="upload-popup-card">
+        <div class="loader-ring"></div>
+        <div class="upload-popup-text" id="uploadPopupText">
+            Uploading...
+        </div>
+    </div>
+</div>
+<div id="pageModal" class="page-modal" style="display:none;">
+    <div class="page-modal-card">
+        <button class="page-close-btn" onclick="closePageModal()">×</button>
+
+        <h2 id="pageModalTitle" class="page-modal-title"></h2>
+
+        <div id="pageModalContent" class="page-modal-content"></div>
+    </div>
+</div>
+<script src="../src/app.js"></script>
+<div id="pageModal" class="page-modal" style="display:none;">
+    <div class="page-modal-card">
+        <button class="page-close-btn" onclick="closePageModal()">×</button>
+
+        <h2 id="pageModalTitle" class="page-modal-title"></h2>
+
+        <div id="pageModalContent" class="page-modal-content"></div>
+    </div>
+</div>
+<script>
+(function(){
+
+    function encodeUrl(url){
+        return btoa(url); // base64
+    }
+
+    function getRealVideo(){
+        // ambil source aktif dari player
+        const vid = document.getElementById("video");
+        return vid ? vid.currentSrc || vid.src : "";
+    }
+
+    const btn = document.getElementById("downloadBtn");
+
+    if(btn){
+        btn.addEventListener("click", function(e){
+            e.preventDefault();
+
+            const real = getRealVideo();
+
+            if(!real){
+                alert("Video belum siap");
+                return;
+            }
+
+            const encoded = encodeUrl(real);
+
+            // arahkan ke safelink
+            window.open("../d/?url=" + encoded, "_blank");
+        });
+    }
+
+})();
+</script>
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4949382,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+</body>
+</html>

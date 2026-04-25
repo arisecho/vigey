@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate Download Link...</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+}
+
+.container{
+    max-width:420px;
+    width:100%;
+    padding:20px;
+    text-align:center;
+}
+
+.box{
+    background:#1e293b;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+h2{
+    margin-bottom:10px;
+}
+
+p{
+    color:#cbd5e1;
+}
+
+.btn{
+    display:block;
+    margin-top:20px;
+    padding:14px;
+    border-radius:12px;
+    background:linear-gradient(90deg,#22c55e,#16a34a);
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.ad-top, .ad-bottom{
+    margin:15px 0;
+    padding:10px;
+    background:#111827;
+    border-radius:10px;
+    font-size:12px;
+    color:#9ca3af;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="box">
+
+        <div class="ad-top">
+            <!-- 🔥 IKLAN ATAS -->
+<script>
+  atOptions = {
+    'key' : '77ca41ab4b35fa2e0130d23d132904c5',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://fundingfashioned.com/77ca41ab4b35fa2e0130d23d132904c5/invoke.js"></script>
+
+        </div>
+
+        <h2>🔐 Generate Link</h2>
+        <p>Please wait... preparing download</p>
+
+        <p id="count"></p>
+
+        <a id="realBtn" class="btn" style="display:none;">
+            DOWNLOAD NOW
+        </a>
+
+        <div class="ad-bottom">
+            <!-- 🔥 IKLAN BAWAH -->
+<script>
+  atOptions = {
+    'key' : '77ca41ab4b35fa2e0130d23d132904c5',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://fundingfashioned.com/77ca41ab4b35fa2e0130d23d132904c5/invoke.js"></script>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================
+// 🔐 AMBIL & DECODE URL
+// ========================
+const params = new URLSearchParams(window.location.search);
+const encoded = params.get("url");
+
+let real = "";
+
+try{
+    real = atob(encoded);
+}catch(e){
+    real = "";
+}
+
+// ========================
+// 🎯 ELEMENT
+// ========================
+const btn = document.getElementById("realBtn");
+const countEl = document.getElementById("count");
+
+// ========================
+// 🔥 RANDOM TIME FUNCTION
+// ========================
+function getRandomTime(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// ========================
+// 🤖 ANTI BOT DETECT
+// ========================
+let t = getRandomTime(6, 10);
+
+if(navigator.webdriver){
+    t = 25; // bot delay lebih lama
+}
+
+// tampilkan angka awal
+countEl.innerText = t;
+
+// ========================
+// ⏳ RANDOM DELAY START
+// ========================
+setTimeout(startTimer, getRandomTime(1000, 3000));
+
+// ========================
+// 🚀 TIMER FUNCTION
+// ========================
+function startTimer(){
+
+    const timer = setInterval(()=>{
+        t--;
+        countEl.innerText = t;
+
+        if(t <= 0){
+            clearInterval(timer);
+
+            btn.style.display = "block";
+            countEl.style.display = "none";
+
+            btn.href = real;
+
+            // 🔥 klik = buka iklan + download
+            btn.addEventListener("click", function(){
+
+                window.open("https://omg10.com/4/10921975", "_blank");
+
+            });
+
+        }
+
+    },1000);
+}
+
+</script>
+</body>
+</html>
