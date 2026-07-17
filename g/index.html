@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Video Fast - URL Generator</title>
+<link rel="icon" type="image/x-icon" href="https://videy.co/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/style.css">
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0; padding: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+.gen-header {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #1e293b;
+    padding: 14px 0; position: sticky; top: 0; z-index: 100;
+}
+.gen-header-inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.gen-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none; color: #fff;
+    font-weight: 700; font-size: 22px; letter-spacing: -0.5px;
+}
+.gen-logo .badge {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; padding: 4px 10px; border-radius: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.gen-back { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+.gen-back:hover { color: #fff; }
+
+.gen-container { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+.gen-hero { text-align: center; margin-bottom: 40px; }
+.gen-hero h1 {
+    font-size: 38px; font-weight: 700; margin: 0 0 12px;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; line-height: 1.2;
+}
+.gen-hero p { color: #94a3b8; font-size: 15px; margin: 0; line-height: 1.6; }
+
+.gen-card {
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 16px; padding: 28px; margin-bottom: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+.gen-card-title {
+    font-size: 14px; font-weight: 600; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 1px; margin: 0 0 16px;
+    display: flex; align-items: center; gap: 8px;
+}
+.gen-card-title::before {
+    content: ""; width: 4px; height: 16px;
+    background: linear-gradient(180deg, #6366f1, #8b5cf6);
+    border-radius: 2px; display: inline-block;
+}
+
+.gen-input-group { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.gen-input {
+    flex: 1; min-width: 240px;
+    background: #0f172a; border: 1px solid #334155; color: #e2e8f0;
+    padding: 14px 16px; border-radius: 10px;
+    font-size: 14px; font-family: 'JetBrains Mono', monospace;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+.gen-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+.gen-input::placeholder { color: #475569; }
+
+.gen-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; border: none; padding: 14px 24px;
+    border-radius: 10px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.2s;
+    font-family: inherit; display: inline-flex; align-items: center; gap: 8px;
+}
+.gen-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
+.gen-btn:active { transform: translateY(0); }
+.gen-btn.secondary { background: #334155; color: #e2e8f0; }
+.gen-btn.secondary:hover { background: #475569; box-shadow: 0 6px 20px rgba(51, 65, 85, 0.4); }
+.gen-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.gen-hint { color: #64748b; font-size: 12px; margin: 8px 0 0; line-height: 1.5; }
+.gen-hint code {
+    background: #0f172a; padding: 2px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 11px;
+}
+
+.gen-result { margin-top: 20px; display: none; }
+.gen-result.show { display: block; }
+.gen-result-item {
+    background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+    padding: 16px; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.gen-result-label { color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; width: 80px; }
+.gen-result-url {
+    flex: 1; min-width: 200px;
+    background: #1e293b; border: 1px solid #334155; padding: 10px 12px;
+    border-radius: 8px; color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    word-break: break-all; user-select: all;
+}
+.gen-copy-btn { background: #334155; color: #e2e8f0; border: none; padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.2s; flex-shrink: 0; font-family: inherit; }
+.gen-copy-btn:hover { background: #475569; }
+.gen-open-btn {
+    background: #16a34a; color: #fff; border: none; padding: 10px 14px;
+    border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s; flex-shrink: 0; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+}
+.gen-open-btn:hover { background: #15803d; }
+
+.gen-divider { height: 1px; background: #334155; margin: 24px 0; border: none; }
+.gen-history { margin-top: 24px; }
+.gen-history-list { display: flex; flex-direction: column; gap: 10px; }
+.gen-history-item {
+    background: #0f172a; border: 1px solid #334155; border-radius: 10px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+    transition: border-color 0.2s;
+}
+.gen-history-item:hover { border-color: #475569; }
+.gen-history-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.gen-history-original { color: #64748b; font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; flex: 1; min-width: 200px; }
+.gen-history-code {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border: 1px solid #4f46e5; color: #c7d2fe;
+    padding: 4px 10px; border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; word-break: break-all;
+}
+.gen-history-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.gen-history-actions button, .gen-history-actions a {
+    background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+    padding: 6px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 500; cursor: pointer;
+    transition: all 0.2s; text-decoration: none; font-family: inherit;
+}
+.gen-history-actions button:hover, .gen-history-actions a:hover { background: #334155; color: #fff; }
+.gen-history-actions .del:hover { background: #b91c1c; border-color: #b91c1c; color: #fff; }
+.gen-empty { text-align: center; color: #475569; padding: 30px 0; font-size: 13px; font-style: italic; }
+
+.gen-info {
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: #c7d2fe;
+    padding: 14px 16px; border-radius: 10px;
+    font-size: 13px; line-height: 1.6; margin-top: 16px;
+}
+.gen-info strong { color: #fff; }
+
+/* SHORTLINK OUTPUT */
+.gen-shortlink-section { margin-bottom: 20px; }
+.gen-shortlink-section:last-of-type { margin-bottom: 0; }
+.gen-shortlink-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.gen-shortlink-badge {
+    color: #fff; padding: 3px 10px; border-radius: 6px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    flex-shrink: 0; transition: background 0.3s ease;
+}
+.gen-shortlink-badge.player { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.gen-shortlink-badge.landing { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.gen-shortlink-desc { color: #94a3b8; font-size: 12px; }
+.gen-shortlink-wrap { display: flex; flex-direction: column; gap: 12px; }
+.gen-shortlink-item {
+    background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+    padding: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    transition: border-color 0.2s;
+}
+.gen-shortlink-item:hover { border-color: #475569; }
+.gen-shortlink-item.empty {
+    color: #475569; font-style: italic;
+    justify-content: center; padding: 24px 16px; text-align: center;
+}
+.gen-shortlink-label { color: #64748b; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; width: 80px; }
+.gen-shortlink-url {
+    flex: 1; min-width: 200px;
+    background: #1e293b; border: 1px solid #334155;
+    padding: 10px 12px; border-radius: 8px;
+    color: #e2e8f0; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    word-break: break-all; user-select: all;
+    display: flex; align-items: center; gap: 8px;
+}
+.gen-shortlink-url .emoji-prefix { color: #fbbf24; font-size: 16px; letter-spacing: 2px; flex-shrink: 0; }
+.gen-shortlink-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.gen-shortlink-actions button {
+    background: #334155; color: #e2e8f0; border: none;
+    padding: 8px 12px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 4px;
+}
+.gen-shortlink-actions button:hover { background: #475569; transform: translateY(-1px); }
+.gen-shortlink-actions button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.gen-shortlink-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #334155; border-top: 2px solid #6366f1;
+    border-radius: 50%; animation: vplSpin 0.8s linear infinite; flex-shrink: 0;
+}
+@keyframes vplSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.gen-shortlink-meta { color: #64748b; font-size: 11px; margin-top: 16px; line-height: 1.5; }
+.gen-shortlink-meta code {
+    background: #0f172a; padding: 2px 6px; border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace; color: #94a3b8; font-size: 10px;
+}
+.gen-shortlink-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; margin-left: auto;
+}
+.gen-shortlink-status.loading { background: rgba(99, 102, 241, 0.1); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.2); }
+.gen-shortlink-status.success { background: rgba(22, 163, 74, 0.1); color: #86efac; border: 1px solid rgba(22, 163, 74, 0.2); }
+.gen-shortlink-status.error { background: rgba(220, 38, 38, 0.1); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.2); }
+
+.gen-toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #16a34a; color: #fff;
+    padding: 12px 24px; border-radius: 10px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s; z-index: 9999;
+}
+.gen-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.gen-toast.error { background: #dc2626; }
+
+@media (max-width: 640px) {
+    .gen-hero h1 { font-size: 28px; }
+    .gen-card { padding: 20px; }
+    .gen-input-group { flex-direction: column; }
+    .gen-input, .gen-btn { width: 100%; }
+    .gen-result-label, .gen-shortlink-label { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="gen-header">
+    <div class="gen-header-inner">
+        <a href="../" class="gen-logo">
+            <span>Video Fast</span>
+            <span class="badge">Generator</span>
+        </a>
+        <a href="../" class="gen-back">&larr; Kembali ke Beranda</a>
+    </div>
+</header>
+
+<main class="gen-container">
+    <!-- ENCODE SECTION -->
+    <div class="gen-card">
+        <h2 class="gen-card-title">Generate Kode</h2>
+        <div class="gen-input-group">
+            <input type="text" id="encodeInput" class="gen-input"
+                placeholder="Paste URL player, URL CDN langsung, atau ID"
+                autocomplete="off" spellcheck="false">
+            <button class="gen-btn" id="encodeBtn" onclick="generateCode()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18l7-5 7 5V3z"/></svg>
+                Generate
+            </button>
+        </div>
+        <p class="gen-hint">
+            Dukung: URL player <code>?id=...</code>, URL CDN langsung
+            (<code>cdn.videy.co</code>, <code>cdn.aceimg.com</code>, <code>cdn.xfree.com</code>,
+            <code>xxxfollow.com</code>, <code>xgroovy.com</code>, <code>qu.ax</code>, dll),
+            atau ID/path mentah.
+        </p>
+        <div class="gen-result" id="encodeResult">
+            <div class="gen-result-item">
+                <span class="gen-result-label">URL</span>
+                <div class="gen-result-url" id="resultUrl">-</div>
+                <button class="gen-copy-btn" onclick="copyResult()">Copy</button>
+                <a class="gen-open-btn" id="openBtn" href="#" target="_blank">Buka</a>
+            </div>
+        </div>
+        <div class="gen-info">
+            <strong>Cara kerja:</strong> Input apapun akan diekstrak ke ID kanonik lalu dienkripsi jadi
+            <code>vv...</code>. Dua shortlink dihasilkan otomatis dengan penugasan acak &mdash;
+            salah satu domain menuju player langsung, yang lain melewati landing page.
+        </div>
+    </div>
+
+    <!-- SHORTLINK OUTPUT -->
+    <div class="gen-card">
+        <h2 class="gen-card-title">Safelink / Shortlink Output</h2>
+
+        <div class="gen-shortlink-section">
+            <div class="gen-shortlink-header">
+                <span class="gen-shortlink-badge player" id="slot0Badge">Player</span>
+                <span class="gen-shortlink-desc" id="slot0Desc">snipo.biz.id &mdash; langsung ke video</span>
+                <span class="gen-shortlink-status" id="slot0Status" style="display:none;"></span>
+            </div>
+            <div class="gen-shortlink-wrap" id="slot0Wrap">
+                <div class="gen-shortlink-item empty">Generate kode di atas, lalu shortlink akan otomatis dibuat di sini.</div>
+            </div>
+        </div>
+
+        <hr class="gen-divider">
+
+        <div class="gen-shortlink-section">
+            <div class="gen-shortlink-header">
+                <span class="gen-shortlink-badge landing" id="slot1Badge">Landing</span>
+                <span class="gen-shortlink-desc" id="slot1Desc">viblo.biz.id &mdash; melewati landing page</span>
+                <span class="gen-shortlink-status" id="slot1Status" style="display:none;"></span>
+            </div>
+            <div class="gen-shortlink-wrap" id="slot1Wrap">
+                <div class="gen-shortlink-item empty">Generate kode di atas, lalu shortlink akan otomatis dibuat di sini.</div>
+            </div>
+        </div>
+
+        <div class="gen-shortlink-meta">
+            Dua shortlink dibuat secara acak: kadang snipo = player &amp; viblo = landing,
+            kadang sebaliknya. Masing-masing domain punya API &amp; database sendiri.
+        </div>
+
+        <div style="margin-top: 14px;">
+            <button class="gen-btn secondary" id="regenShortlinkBtn" onclick="regenerateShortlinks()" disabled style="font-size: 12px; padding: 10px 16px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9c2.5 0 4.7 1 6.4 2.6L21 8"/><path d="M21 3v5h-5"/></svg>
+                Generate Ulang Semua Shortlink
+            </button>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="gen-card gen-history">
+        <h2 class="gen-card-title">Riwayat Generate</h2>
+        <div class="gen-history-list" id="historyList">
+            <div class="gen-empty">Belum ada riwayat. Generate kode pertama Anda di atas.</div>
+        </div>
+        <div id="historyActions" style="margin-top: 14px; display: none;">
+            <button class="gen-btn secondary" onclick="clearHistory()" style="font-size: 12px; padding: 8px 14px;">
+                Hapus Semua Riwayat
+            </button>
+        </div>
+    </div>
+</main>
+
+<div class="gen-toast" id="toast">Tersalin!</div>
+
+<!-- Config & Codec (load dulu, sync) -->
+<script src="../src/config.js"></script>
+<script src="../src/vidvast-codec.js"></script>
+
+<script>
+// =====================================================================
+// GENERATOR UI LOGIC
+// FIX UTAMA:
+// 1. SITE_BASE pakai VidvastConfig (bukan regex yang bisa salah)
+// 2. createShortLink pakai fetch + timeout + CORS fallback
+// 3. Error message jelas: bedakan CORS, network, server
+// 4. Pakai VidvastCodec dari file terpisah (konsisten dengan /v/ dan /d/)
+// =====================================================================
+(function () {
+    var HISTORY_KEY = 'vidvast_generator_history';
+    var SITE_BASE = (window.VidvastConfig && VidvastConfig.SITE_BASE) || (location.origin + '/');
+
+    function $(id) { return document.getElementById(id); }
+
+    function showToast(msg, isError) {
+        var t = $('toast');
+        t.textContent = msg;
+        t.classList.toggle('error', !!isError);
+        t.classList.add('show');
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(function () { t.classList.remove('show'); }, 2500);
+    }
+
+    function loadHistory() {
+        try {
+            var raw = localStorage.getItem(HISTORY_KEY);
+            if (!raw) return [];
+            var arr = JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+    }
+    function saveHistory(list) {
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    function addHistory(original, code) {
+        var list = loadHistory();
+        var filtered = list.filter(function (it) { return it.original !== original; });
+        filtered.unshift({ original: original, code: code, ts: Date.now() });
+        if (filtered.length > 50) filtered.length = 50;
+        saveHistory(filtered);
+        renderHistory();
+    }
+    function removeHistory(code) {
+        saveHistory(loadHistory().filter(function (it) { return it.code !== code; }));
+        renderHistory();
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+    }
+    function escapeAttr(s) {
+        return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+    function renderHistory() {
+        var list = loadHistory();
+        var container = $('historyList');
+        var actions = $('historyActions');
+        if (list.length === 0) {
+            container.innerHTML = '<div class="gen-empty">Belum ada riwayat. Generate kode pertama Anda di atas.</div>';
+            actions.style.display = 'none';
+            return;
+        }
+        actions.style.display = 'block';
+        container.innerHTML = list.map(function (it) {
+            var originalShort = it.original.length > 60 ? it.original.slice(0, 57) + '...' : it.original;
+            var url = SITE_BASE + 'v/?id=' + it.code;
+            return '<div class="gen-history-item">' +
+                '<div class="gen-history-row">' +
+                    '<div class="gen-history-original" title="' + escapeHtml(it.original) + '">' + escapeHtml(originalShort) + '</div>' +
+                    '<span class="gen-history-code">' + escapeHtml(it.code) + '</span>' +
+                '</div>' +
+                '<div class="gen-history-actions">' +
+                    '<a href="' + url + '" target="_blank">Buka</a>' +
+                    '<button onclick="copyText(\'' + escapeAttr(url) + '\')">Copy URL</button>' +
+                    '<button onclick="copyText(\'' + escapeAttr(it.code) + '\')">Copy Kode</button>' +
+                    '<button class="del" onclick="deleteHistory(\'' + escapeAttr(it.code) + '\')">Hapus</button>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    window.generateCode = function () {
+        var raw = $('encodeInput').value;
+        if (!raw.trim()) { showToast('Isi dulu URL/ID-nya', true); return; }
+        var originalId = VidvastCodec.extractIdFromInput(raw);
+        if (!originalId) { showToast('Format tidak dikenali', true); return; }
+        var code = VidvastCodec.encode(originalId);
+        var url = SITE_BASE + 'v/?id=' + code;
+        $('resultUrl').textContent = url;
+        $('openBtn').href = url;
+        $('encodeResult').classList.add('show');
+        addHistory(originalId, code);
+        showToast('Kode berhasil dibuat');
+    };
+    window.copyResult = function () { copyText($('resultUrl').textContent); };
+    window.copyText = function (text) {
+        if (!text || text === '-') { showToast('Tidak ada teks', true); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () { showToast('Tersalin!'); })
+                .catch(function () { fallbackCopy(text); });
+        } else { fallbackCopy(text); }
+    };
+    function fallbackCopy(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); showToast('Tersalin!'); }
+        catch (e) { showToast('Gagal menyalin', true); }
+        document.body.removeChild(ta);
+    }
+    window.deleteHistory = function (code) { removeHistory(code); showToast('Riwayat dihapus'); };
+    window.clearHistory = function () {
+        if (!confirm('Hapus semua riwayat?')) return;
+        saveHistory([]); renderHistory(); showToast('Riwayat dikosongkan');
+    };
+
+    $('encodeInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); generateCode(); }
+    });
+
+    renderHistory();
+
+    // =================================================================
+    // DUAL SHORTLINK
+    // =================================================================
+    var DOMAINS = (window.VidvastConfig && VidvastConfig.SHORTLINK_DOMAINS) || [
+        { slotId: 'slot0', api: 'https://vidy.biz.id/ar.php',       domain: 'https://viblo.biz.id' },
+        { slotId: 'slot1', api: 'https://vidy.biz.id/ar2.php',  domain: 'https://snipo.biz.id' }
+    ];
+
+    var RANDOM_EMOJIS = [
+        '\uD83D\uDD1E','\uD83D\uDD1E','\uD83D\uDD1E','\uD83D\uDD1E','\uD83D\uDD1E',
+        '\u25B6\uFE0F','\u25B6\uFE0F','\u25B6\uFE0F','\u25B6\uFE0F',
+        '\u23FA\uFE0F','\u23FA\uFE0F','\u23FA\uFE0F',
+        '\u25B6\uFE0F','\u23F8\uFE0F','\u23F9\uFE0F',
+        '\uD83D\uDC49','\uD83D\uDC46','\uD83D\uDC47','\uD83D\uDC48','\u261D\uFE0F',
+        '\u25B6\uFE0F','\u23E9','\u23EA',
+        '\uD83C\uDFE5','\uD83C\uDFAC','\uD83D\uDCF9','\uD83D\uDCFD\uFE0F','\uD83C\uDFDE\uFE0F',
+        '\u26A0\uFE0F','\u2757','\u2755','\u203C\uFE0F',
+        '\uD83D\uDCE2','\uD83D\uDD14','\uD83D\uDCE3'
+    ];
+    function getRandomEmoji() { return RANDOM_EMOJIS[Math.floor(Math.random() * RANDOM_EMOJIS.length)]; }
+    function generateShortCode() { return Math.random().toString(36).substring(2, 7); }
+
+    var lastEncodedCode = '';
+
+    // FIX: fetch dengan timeout + CORS fallback + retry
+    function fetchWithTimeout(url, opts, timeoutMs) {
+        timeoutMs = timeoutMs || (VidvastConfig.fetchTimeoutMs || 12000);
+        return new Promise(function (resolve, reject) {
+            var ctrl = (window.AbortController) ? new AbortController() : null;
+            var timer = setTimeout(function () {
+                if (ctrl) ctrl.abort();
+                reject(new Error('TIMEOUT'));
+            }, timeoutMs);
+            opts = opts || {};
+            if (ctrl) opts.signal = ctrl.signal;
+            fetch(url, opts).then(function (res) {
+                clearTimeout(timer);
+                resolve(res);
+            }).catch(function (err) {
+                clearTimeout(timer);
+                reject(err);
+            });
+        });
+    }
+
+    // Buat satu shortlink ke satu API (dengan fallback CORS proxy)
+    function createShortLink(targetUrl, cfg) {
+        var endpoints = [cfg.api];
+        if (cfg.apiFallback) endpoints.push(cfg.apiFallback);
+
+        return new Promise(function (resolve, reject) {
+            var attempts = 0;
+            var endpointIdx = 0;
+
+            function tryOnce() {
+                if (attempts >= 5) {
+                    reject(new Error('Gagal setelah 5 percobaan. Cek koneksi/CORS API.'));
+                    return;
+                }
+                if (endpointIdx >= endpoints.length) {
+                    reject(new Error('Semua endpoint gagal (kemungkinan CORS atau server down).'));
+                    return;
+                }
+                attempts++;
+                var code = generateShortCode();
+                var endpoint = endpoints[endpointIdx];
+                var payload = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'create_link', code: code, url: targetUrl })
+                };
+
+                fetchWithTimeout(endpoint, payload)
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        if (data && data.success && data.data) {
+                            resolve({
+                                code: data.data.code,
+                                url: data.data.url,
+                                shortlink: cfg.domain + '/#' + data.data.code
+                            });
+                        } else {
+                            // Coba lagi dengan code baru
+                            tryOnce();
+                        }
+                    })
+                    .catch(function (err) {
+                        var msg = String(err.message || err);
+                        // TypeError "Failed to fetch" = CORS atau network
+                        if (msg === 'TIMEOUT' || /Failed to fetch|NetworkError|Load failed/i.test(msg)) {
+                            // Pindah ke endpoint fallback (CORS proxy)
+                            endpointIdx++;
+                            attempts = 0; // reset percobaan untuk endpoint baru
+                            tryOnce();
+                        } else {
+                            reject(new Error(msg));
+                        }
+                    });
+            }
+            tryOnce();
+        });
+    }
+
+    function setStatus(slotId, type, msg) {
+        var el = $(slotId + 'Status');
+        if (!el) return;
+        if (!type) {
+            el.style.display = 'none';
+            el.className = 'gen-shortlink-status';
+            el.textContent = '';
+            return;
+        }
+        el.style.display = 'inline-flex';
+        el.className = 'gen-shortlink-status ' + type;
+        if (type === 'loading') {
+            el.innerHTML = '<span class="gen-shortlink-spinner"></span> ' + (msg || 'Creating...');
+        } else {
+            el.textContent = msg || '';
+        }
+    }
+
+    function renderSlotResult(slotId, result, error) {
+        var wrap = $(slotId + 'Wrap');
+        if (!wrap) return;
+        if (error) {
+            wrap.innerHTML =
+                '<div class="gen-shortlink-item empty" style="color:#fca5a5;border-color:rgba(220,38,38,0.3);">' +
+                    'Gagal: ' + escapeHtml(error) +
+                    '<br><span style="font-size:11px;opacity:0.7;">' +
+                        'Kemungkinan CORS: pastikan API server mengizinkan origin ' +
+                        escapeHtml(location.origin) + '. Lihat laporan PDF bagian "CORS Fix".' +
+                    '</span>' +
+                '</div>';
+            return;
+        }
+        if (!result) {
+            wrap.innerHTML = '<div class="gen-shortlink-item empty">Generate kode di atas, lalu shortlink akan otomatis dibuat di sini.</div>';
+            return;
+        }
+        var emojiPrefix = getRandomEmoji() + getRandomEmoji();
+        var copyWithEmoji = emojiPrefix + ' ' + result.shortlink;
+        var copyPlain = result.shortlink;
+        wrap.innerHTML =
+            '<div class="gen-shortlink-item">' +
+                '<span class="gen-shortlink-label">Shortlink</span>' +
+                '<div class="gen-shortlink-url">' +
+                    '<span class="emoji-prefix">' + emojiPrefix + '</span>' +
+                    '<span>' + escapeHtml(result.shortlink) + '</span>' +
+                '</div>' +
+                '<div class="gen-shortlink-actions">' +
+                    '<button onclick="copyShortlink(\'' + escapeAttr(copyWithEmoji) + '\')">Copy + Emoji</button>' +
+                    '<button onclick="copyShortlink(\'' + escapeAttr(copyPlain) + '\')">Copy URL</button>' +
+                    '<a class="gen-open-btn" href="' + escapeAttr(result.shortlink) + '" target="_blank" style="font-size:11px;padding:8px 12px;">Buka</a>' +
+                '</div>' +
+            '</div>' +
+            '<div class="gen-shortlink-item">' +
+                '<span class="gen-shortlink-label">Code</span>' +
+                '<div class="gen-shortlink-url"><span>' + escapeHtml(result.code) + '</span></div>' +
+                '<div class="gen-shortlink-actions">' +
+                    '<button onclick="copyShortlink(\'' + escapeAttr(result.code) + '\')">Copy Code</button>' +
+                '</div>' +
+            '</div>';
+    }
+
+    window.copyShortlink = function (text) { copyText(text); };
+
+    function autoGenerateBoth(encodedCode) {
+        if (!encodedCode) return;
+        lastEncodedCode = encodedCode;
+
+        var regenBtn = $('regenShortlinkBtn');
+        if (regenBtn) regenBtn.disabled = true;
+
+        var urlPlayer  = SITE_BASE + 'v/?id=' + encodedCode;
+        var urlLanding = SITE_BASE + 'get/?id=' + encodedCode;
+
+        var targets = (Math.random() < 0.5) ? [urlPlayer, urlLanding] : [urlLanding, urlPlayer];
+
+        var labels = [
+            { text: 'Player',  cls: 'player',  desc: 'langsung ke video' },
+            { text: 'Landing', cls: 'landing', desc: 'melewati landing page' }
+        ];
+
+        // FIX: proses kedua slot paralel (lebih cepat)
+        processSlot(0, targets, labels);
+        processSlot(1, targets, labels);
+
+        function checkAllDone() {
+            // enabled regen button setelah keduanya selesai
+            var s0 = $('slot0Status'), s1 = $('slot1Status');
+            var s0Loading = s0 && s0.classList.contains('loading');
+            var s1Loading = s1 && s1.classList.contains('loading');
+            if (!s0Loading && !s1Loading && regenBtn) regenBtn.disabled = false;
+            else setTimeout(checkAllDone, 300);
+        }
+        setTimeout(checkAllDone, 500);
+    }
+
+    function processSlot(index, targets, labels) {
+        var cfg = DOMAINS[index];
+        var targetUrl = targets[index];
+        var label = (targetUrl.indexOf('/get/?id=') !== -1) ? labels[1] : labels[0];
+
+        var badgeEl = $(cfg.slotId + 'Badge');
+        var descEl = $(cfg.slotId + 'Desc');
+        if (badgeEl) { badgeEl.textContent = label.text; badgeEl.className = 'gen-shortlink-badge ' + label.cls; }
+        if (descEl)  { descEl.textContent = cfg.domain.replace('https://', '') + ' \u2014 ' + label.desc; }
+
+        setStatus(cfg.slotId, 'loading', 'Membuat shortlink...');
+        renderSlotResult(cfg.slotId, null);
+
+        createShortLink(targetUrl, cfg)
+            .then(function (result) {
+                renderSlotResult(cfg.slotId, result);
+                setStatus(cfg.slotId, 'success', 'Siap');
+                setTimeout(function () { setStatus(cfg.slotId, null); }, 3000);
+            })
+            .catch(function (err) {
+                var msg = String(err.message || err);
+                renderSlotResult(cfg.slotId, null, msg);
+                setStatus(cfg.slotId, 'error', 'Gagal');
+                showToast('Slot ' + (index + 1) + ' gagal: ' + msg, true);
+                setTimeout(function () { setStatus(cfg.slotId, null); }, 5000);
+            });
+    }
+
+    window.regenerateShortlinks = function () {
+        if (!lastEncodedCode) { showToast('Generate kode dulu', true); return; }
+        autoGenerateBoth(lastEncodedCode);
+    };
+
+    // Hook: generateCode otomatis trigger shortlink generation
+    var _originalGenerateCode = window.generateCode;
+    window.generateCode = function () {
+        _originalGenerateCode();
+        setTimeout(function () {
+            var resultUrl = $('resultUrl');
+            if (resultUrl && resultUrl.textContent && resultUrl.textContent !== '-') {
+                var idMatch = resultUrl.textContent.match(/[?&]id=([^&#]+)/);
+                if (idMatch && idMatch[1]) autoGenerateBoth(idMatch[1]);
+            }
+        }, 50);
+    };
+})();
+</script>
+
+</body>
+</html>

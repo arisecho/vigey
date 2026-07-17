@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+  // =====================================================================
+  // 404 ROUTER (FIX)
+  // - Pola /g/{CODE}        -> /v/?id={CODE}  (alternative player URL)
+  // - Pola /v/{CODE}        -> /v/?id={CODE}  (path style)
+  // - Pola /{CODE}          -> /v/?id={CODE}  (root-level single token)
+  // - Pola lainnya          -> /f/            (default = gallery)
+  // =====================================================================
+  (function () {
+      var path = window.location.pathname || '/';
+      var clean = path.replace(/^\/+|\/+$/g, '');
+
+      // Pola: g/SINGLE_TOKEN  atau v/SINGLE_TOKEN
+      var m = clean.match(/^(?:g|v)\/([^\/]+)$/);
+      if (m) {
+          var code = m[1];
+          try { code = decodeURIComponent(code); } catch (e) {}
+          window.location.replace('/v/?id=' + encodeURIComponent(code));
+          return;
+      }
+
+      // Pola: SINGLE_TOKEN di root (mis. /vvA1oaAygnEzwf)
+      // Hanya redirect jika token terlihat seperti encoded code (vv...) atau ID pendek.
+      if (clean && clean.indexOf('/') === -1) {
+          var token = clean;
+          try { token = decodeURIComponent(token); } catch (e) {}
+          // Hanya anggap sebagai video ID jika bukan path file populer
+          if (!/\.(html|css|js|png|jpg|jpeg|gif|ico|svg|json|txt|xml|woff2?|ttf)$/i.test(token)) {
+              window.location.replace('/v/?id=' + encodeURIComponent(token));
+              return;
+          }
+      }
+
+      // Default: redirect ke home (BUKAN /f/ gallery yang hardcoded video-nya)
+      window.location.href = '/';
+  })();
+  </script>
+  <meta http-equiv="refresh" content="0; url=/" />
+</head>
+<body>
+  <p>Redirecting...</p>
+  <p><a href="/">Klik di sini jika tidak otomatis dialihkan</a></p>
+</body>
+</html>

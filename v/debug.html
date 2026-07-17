@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>DEBUG - Vidvast Player</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: #0b0f1a;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    padding: 14px;
+    min-height: 100vh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+}
+h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #fff;
+}
+.subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+.test-input {
+    width: 100%;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: monospace;
+    margin-bottom: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.test-btn {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    margin-bottom: 12px;
+}
+.test-btn:active { background: #4f46e5; }
+.video-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.video-wrap video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+}
+.log-panel {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #cbd5e1;
+    max-height: 300px;
+    overflow-y: auto;
+    word-break: break-all;
+}
+.log-panel .log-ok { color: #86efac; }
+.log-panel .log-err { color: #fca5a5; }
+.log-panel .log-warn { color: #fde68a; }
+.log-panel .log-info { color: #93c5fd; }
+.clear-btn {
+    background: #334155;
+    color: #cbd5e1;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 16px 0 8px;
+}
+.preset-list { display: flex; flex-direction: column; gap: 6px; }
+.preset-item {
+    background: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: monospace;
+    cursor: pointer;
+    word-break: break-all;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.preset-item:active { background: #334155; }
+.info-box {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #c7d2fe;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+
+<h1>DEBUG Vidvast Player</h1>
+<p class="subtitle">
+    Halaman minimal tanpa iklan, tanpa pre-loader, tanpa codec.
+    Paste URL MP4 langsung untuk test apakah video bisa diputar di device ini.
+</p>
+
+<div class="info-box">
+    <strong>Cara pakai:</strong> Klik salah satu preset di bawah, atau paste URL MP4 manual, lalu klik "Test Video".
+    Jika video tampil di sini tapi tidak di /v/?id=... → masalah di codec atau script /v/.
+    Jika video tidak tampil di sini juga → masalah di CDN atau koneksi device.
+</div>
+
+<input type="text" class="test-input" id="urlInput" placeholder="https://...mp4" autocomplete="off" spellcheck="false">
+<button class="test-btn" id="testBtn">Test Video</button>
+
+<div class="video-wrap">
+    <video id="testVideo"
+           controls
+           autoplay
+           muted
+           playsinline
+           webkit-playsinline
+           preload="auto"
+           width="100%"></video>
+</div>
+
+<div style="margin-top: 10px; padding: 10px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; font-size: 11px; color: #86efac; line-height: 1.5;">
+    <strong>AUTOPLAY ON:</strong> Video akan autoplay muted setelah <code>loadeddata</code> event fire.
+    Tap tombol <strong>"Fullscreen"</strong> di bawah untuk unmute + fullscreen + play.
+    <br><br>
+    <button id="fsBtn" style="background:#16a34a;color:#fff;border:none;padding:10px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;-webkit-appearance:none;appearance:none;width:100%;">
+        Tap to Watch in Fullscreen + Sound
+    </button>
+</div>
+
+<div class="section-title">Preset URL</div>
+<div class="preset-list" id="presetList"></div>
+
+<div class="section-title">Log</div>
+<div class="log-panel" id="logPanel"></div>
+<button class="clear-btn" onclick="document.getElementById('logPanel').innerHTML=''">Clear Log</button>
+
+<script>
+(function () {
+    var urlInput = document.getElementById('urlInput');
+    var testBtn = document.getElementById('testBtn');
+    var video = document.getElementById('testVideo');
+    var logPanel = document.getElementById('logPanel');
+    var presetList = document.getElementById('presetList');
+
+    function log(msg, kind) {
+        var k = kind || 'info';
+        var line = document.createElement('div');
+        line.className = 'log-' + k;
+        var time = new Date().toLocaleTimeString();
+        line.textContent = '[' + time + '] ' + msg;
+        logPanel.appendChild(line);
+        logPanel.scrollTop = logPanel.scrollHeight;
+        try { console.log('[DEBUG]', msg); } catch (e) {}
+    }
+
+    log('Page loaded', 'ok');
+    log('UA: ' + navigator.userAgent, 'info');
+    log('Origin: ' + window.location.origin, 'info');
+
+    var presets = [
+        'https://cdn.videy.co/iUwQIpnw1.mp4',
+        'https://cdn2.videy.co/iUwQIpnw1.mp4',
+        'https://cdn.aceimg.com/533502e1d.mp4',
+        'https://qu.ax/x/i3ayM.mp4',
+        'https://www.xxxfollow.com/media/fans/post_public/3918/39184444/911941.mp4',
+        'https://cdn.xfree.com/xfree-prod/5/1/b/51b27bc1-7bed-482b-8db9-aa5181f523c4/full.mp4'
+    ];
+
+    presets.forEach(function (url) {
+        var btn = document.createElement('button');
+        btn.className = 'preset-item';
+        btn.textContent = url;
+        btn.onclick = function () {
+            urlInput.value = url;
+            testVideo();
+        };
+        presetList.appendChild(btn);
+    });
+
+    function testVideo() {
+        var url = urlInput.value.trim();
+        if (!url) {
+            log('URL kosong', 'err');
+            return;
+        }
+        log('Testing URL: ' + url, 'info');
+        // Reset video
+        video.removeAttribute('src');
+        try { video.load(); } catch (e) {}
+
+        // Set new src
+        video.src = url;
+        try { video.load(); } catch (e) {}
+        log('video.src set, load() called', 'info');
+    }
+
+    testBtn.addEventListener('click', testVideo);
+
+    // Video event listeners
+    video.addEventListener('loadstart', function () { log('EVENT: loadstart', 'info'); });
+    video.addEventListener('loadedmetadata', function () { log('EVENT: loadedmetadata (dur=' + video.duration + 's)', 'info'); });
+    video.addEventListener('loadeddata', function () { log('EVENT: loadeddata', 'ok'); });
+    video.addEventListener('canplay', function () { log('EVENT: canplay', 'ok'); });
+    video.addEventListener('canplaythrough', function () { log('EVENT: canplaythrough', 'ok'); });
+    video.addEventListener('playing', function () { log('EVENT: playing', 'ok'); });
+    video.addEventListener('waiting', function () { log('EVENT: waiting', 'warn'); });
+    video.addEventListener('stalled', function () { log('EVENT: stalled', 'warn'); });
+    video.addEventListener('suspend', function () { log('EVENT: suspend', 'warn'); });
+    video.addEventListener('abort', function () { log('EVENT: abort', 'warn'); });
+    video.addEventListener('emptied', function () { log('EVENT: emptied', 'warn'); });
+
+    video.addEventListener('progress', function () {
+        try {
+            if (video.buffered && video.buffered.length > 0) {
+                var end = video.buffered.end(video.buffered.length - 1);
+                log('progress: buffered=' + end.toFixed(1) + 's / ' + (video.duration || 0).toFixed(1) + 's', 'info');
+            }
+        } catch (e) {}
+    });
+
+    video.addEventListener('error', function () {
+        var err = video.error;
+        var code = err ? err.code : 'unknown';
+        var msg = err ? err.message : 'no message';
+        var codeMap = { 1: 'ABORTED', 2: 'NETWORK', 3: 'DECODE', 4: 'SRC_NOT_SUPPORTED' };
+        var codeName = codeMap[code] || code;
+        log('EVENT: error code=' + code + ' (' + codeName + ') msg=' + msg, 'err');
+        log('  src=' + video.src, 'err');
+    });
+
+    // ---- AUTOPLAY LOGIC (muted) ----
+    video.addEventListener('loadeddata', function () {
+        log('AUTOPLAY: trying muted play()', 'info');
+        video.muted = true;
+        video.volume = 1.0;
+        var p = video.play();
+        if (p && p.then) {
+            p.then(function () { log('AUTOPLAY: OK (muted)', 'ok'); })
+             .catch(function (err) { log('AUTOPLAY: blocked ' + (err && err.name), 'err'); });
+        }
+    });
+
+    // ---- FULLSCREEN BUTTON ----
+    var fsBtn = document.getElementById('fsBtn');
+    if (fsBtn) {
+        function activateFullscreen() {
+            log('USER ACTIVATE: unmute + fullscreen + play', 'ok');
+            // Unmute
+            try {
+                video.muted = false;
+                video.volume = 1.0;
+            } catch (e) {}
+            // Play with sound
+            var p = video.play();
+            if (p && p.catch) p.catch(function (err) {
+                log('play after tap failed: ' + (err && err.name), 'err');
+            });
+            // Fullscreen (cross-browser)
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            var target = isIOS ? video : (video.parentNode);
+            try {
+                if (target.requestFullscreen)         target.requestFullscreen();
+                else if (target.webkitRequestFullscreen) target.webkitRequestFullscreen();
+                else if (target.webkitEnterFullscreen)   target.webkitEnterFullscreen(); // iOS
+                else if (target.msRequestFullscreen)     target.msRequestFullscreen();
+                else log('Fullscreen API not supported', 'err');
+            } catch (e) {
+                log('Fullscreen error: ' + e.message, 'err');
+            }
+        }
+        fsBtn.addEventListener('click', activateFullscreen);
+    }
+
+    // Auto-test jika ada ?url= di query string
+    var params = new URLSearchParams(window.location.search);
+    var autoUrl = params.get('url');
+    if (autoUrl) {
+        urlInput.value = autoUrl;
+        setTimeout(testVideo, 500);
+    }
+})();
+</script>
+
+</body>
+</html>

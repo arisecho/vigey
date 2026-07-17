@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ========== ANTI CRAWL (bot mesin, bukan in-app browser) ========== -->
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noodp">
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none'">
+  <meta name="google" content="notranslate">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- ========== OG TAGS ========== -->
+  <meta property="og:type" content="video.other">
+  <meta property="og:site_name" id="ogSiteName" content="">
+  <meta property="og:title" id="ogTitle" content="">
+  <meta property="og:description" id="ogDesc" content="">
+  <meta property="og:image" content="https://placehold.co/600x315/1a1a2e/e0e0e0?text=Watch+Now">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="315">
+  <meta property="og:url" id="ogUrl" content="">
+
+  <title>Loading...</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0e0e10; --fg: #f0f0f0; --muted: #6b6b76; --border: rgba(255,255,255,0.06);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--fg);
+      min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+    }
+    header {
+      width: 100%; padding: 22px 20px; text-align: center;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .site-name {
+      font-size: clamp(18px, 5vw, 26px); font-weight: 800; letter-spacing: 3px;
+      text-transform: uppercase; text-decoration: none; color: var(--fg);
+      position: relative; display: inline-block; transition: color 0.3s ease;
+    }
+    .site-name::after {
+      content: ''; position: absolute; bottom: -4px; left: 50%;
+      transform: translateX(-50%); width: 0; height: 2px;
+      background: #00e676; transition: width 0.35s ease; border-radius: 2px;
+    }
+    .site-name:hover { color: #00e676; }
+    .site-name:hover::after { width: 100%; }
+
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 36px 20px; }
+    .btn-group {
+      display: flex; flex-direction: column; gap: 18px;
+      align-items: center; width: 100%; max-width: 320px;
+    }
+    .btn {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; width: 100%; max-width: 280px; padding: 15px 32px;
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 1.4px; text-transform: uppercase; text-decoration: none;
+      color: var(--bg); border: none; border-radius: 60px; cursor: pointer;
+      overflow: hidden; background: var(--btn-bg, #00e676);
+      box-shadow: 0 4px 20px var(--btn-sh-rest, rgba(0,230,118,0.25));
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, opacity 0.4s ease;
+      z-index: 1; opacity: 0; transform: translateY(20px);
+    }
+    .btn.show { opacity: 1; transform: translateY(0); }
+    .btn::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+      z-index: -1;
+    }
+    .btn:hover::before { animation: shine 0.7s ease forwards; }
+    @keyframes shine { to { left: 100%; } }
+    .btn .ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.5); transform: scale(0);
+      animation: rippleAnim 0.6s ease-out forwards; pointer-events: none; z-index: 0;
+    }
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+    .btn:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 8px 35px var(--btn-sh-hover, rgba(0,230,118,0.45));
+    }
+    .btn:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 2px 10px var(--btn-sh-active, rgba(0,230,118,0.3));
+    }
+    .btn i { font-size: 15px; transition: transform 0.3s ease; }
+    .btn:hover i { transform: scale(1.2); }
+
+    footer { width: 100%; padding: 18px 20px; text-align: center; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .footer-text { font-size: 12px; color: var(--muted); letter-spacing: 0.3px; }
+    .footer-backlink { color: #00e676; text-decoration: none; font-weight: 600; position: relative; transition: color 0.3s ease; }
+    .footer-backlink::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px;
+      background: #00e676; transition: width 0.3s ease;
+    }
+    .footer-backlink:hover { color: #fff; }
+    .footer-backlink:hover::after { width: 100%; background: #fff; }
+
+    .online-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9990;
+      background: rgba(10, 10, 12, 0.92);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(0, 230, 118, 0.12);
+      padding: 10px 16px; display: flex; align-items: center; justify-content: center;
+      gap: 10px; pointer-events: none; user-select: none;
+      box-shadow: 0 -4px 24px rgba(0, 230, 118, 0.06);
+    }
+    .online-bar .dot-wrap { position: relative; width: 10px; height: 10px; flex-shrink: 0; }
+    .online-bar .dot-wrap .dot { width: 10px; height: 10px; border-radius: 50%; background: #00e676; animation: dotPulse 1.6s ease-in-out infinite; }
+    .online-bar .dot-wrap .ring {
+      position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+      border-radius: 50%; border: 2px solid #00e676;
+      transform: translate(-50%, -50%); animation: ringExpand 1.6s ease-out infinite; opacity: 0;
+    }
+    @keyframes dotPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.75); } }
+    @keyframes ringExpand { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; } 100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; } }
+    .online-bar .online-text { font-size: 13px; font-weight: 600; color: #c0c0c8; letter-spacing: 0.4px; }
+    .online-bar .online-text strong { color: #00e676; font-weight: 800; font-size: 15px; min-width: 36px; display: inline-block; text-align: center; }
+    .online-bar .online-text .label-after { color: #888; font-weight: 400; }
+
+    .notif-container {
+      position: fixed; bottom: 52px; left: 16px; z-index: 9999;
+      display: flex; flex-direction: column-reverse; gap: 8px;
+      pointer-events: none; max-width: 330px; width: calc(100% - 32px);
+    }
+    .notif-popup {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      background: rgba(22, 22, 26, 0.96);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5); pointer-events: auto;
+      animation: notifIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      position: relative; overflow: hidden;
+    }
+    .notif-popup.removing { animation: notifOut 0.3s ease forwards; }
+    @keyframes notifIn { from { opacity: 0; transform: translateX(-30px) scale(0.92); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    @keyframes notifOut { to { opacity: 0; transform: translateX(-30px) scale(0.92); } }
+    .notif-popup::after {
+      content: ''; position: absolute; bottom: 0; left: 0; height: 2px;
+      background: var(--notif-accent, #00e676);
+      animation: notifProgress 5s linear forwards; border-radius: 0 0 12px 12px;
+    }
+    .notif-popup.removing::after { animation: none; }
+    @keyframes notifProgress { from { width: 100%; } to { width: 0%; } }
+    .notif-avatar { width: 34px; height: 34px; min-width: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0; }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-text { font-size: 11.5px; line-height: 1.4; color: #c8c8d0; }
+    .notif-text strong { color: #fff; font-weight: 600; }
+    .notif-time { font-size: 10px; color: var(--muted); margin-top: 1px; display: block; }
+    .notif-close {
+      position: absolute; top: 4px; right: 6px;
+      background: none; border: none; color: #444;
+      font-size: 14px; cursor: pointer; padding: 2px 4px; line-height: 1; transition: color 0.2s;
+    }
+    .notif-close:hover { color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .btn::before, .btn .ripple, .notif-popup, .notif-popup.removing, .notif-popup::after, .online-bar .dot, .online-bar .ring { animation: none !important; }
+      .btn, .btn.show { transition: none !important; }
+    }
+    @media (max-width: 480px) {
+      header { padding: 16px 14px; }
+      main { padding: 28px 14px 40px; }
+      .btn-group { gap: 14px; }
+      .btn { padding: 13px 22px; font-size: 12.5px; letter-spacing: 1.1px; max-width: 260px; }
+      .btn i { font-size: 13px; }
+      footer { padding: 14px 14px 50px; }
+      .footer-text { font-size: 11px; }
+      .online-bar { padding: 8px 12px; }
+      .online-bar .online-text { font-size: 11.5px; }
+      .online-bar .online-text strong { font-size: 13px; }
+      .notif-container { bottom: 48px; left: 10px; max-width: 280px; width: calc(100% - 20px); }
+      .notif-popup { padding: 9px 12px; gap: 8px; }
+      .notif-avatar { width: 30px; height: 30px; min-width: 30px; font-size: 12px; }
+      .notif-text { font-size: 10.5px; }
+      .notif-time { font-size: 9px; }
+    }
+    @media (min-width: 768px) {
+      .btn { max-width: 300px; padding: 17px 38px; font-size: 15px; }
+      .notif-container { max-width: 350px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="site-name" id="siteName">Loading...</a>
+  </header>
+
+  <main>
+    <div class="btn-group" id="btnGroup" data-nosnippet>
+      <a href="#" class="btn" id="btnWatchNow" aria-label="Watch Now">
+        <i class="fa-solid fa-circle-play"></i> Watch Now
+      </a>
+      <a href="https://fundingfashioned.com/a4vd13952a?key=9147ec6f3bd8b8ca1b105b1edbe281e1" class="btn" id="btnFullHD" aria-label="Full HD">
+        <i class="fa-solid fa-display"></i> Full HD
+      </a>
+      <a href="https://fundingfashioned.com/a4vd13952a?key=9147ec6f3bd8b8ca1b105b1edbe281e1" class="btn" id="btnWatchMore" aria-label="Watch More">
+        <i class="fa-solid fa-play"></i> Watch More
+      </a>
+      <a href="#" class="btn" id="btnDownload" aria-label="Download Now">
+        <i class="fa-solid fa-download"></i> Download Now
+      </a>
+    </div>
+  </main>
+
+  <footer data-nosnippet>
+    <p class="footer-text">
+      &copy; 2025 <span id="footerName">...</span> &mdash;
+      <a href="/" class="footer-backlink">Back to Home</a>
+    </p>
+  </footer>
+
+  <div class="online-bar" data-nosnippet>
+    <div class="dot-wrap"><div class="dot"></div><div class="ring"></div></div>
+    <span class="online-text">
+      <strong id="onlineNum">0</strong>
+      <span class="label-after">users watching now</span>
+    </span>
+  </div>
+
+  <div class="notif-container" id="notifContainer" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      // ============================================================
+      // FIX: ANTI CRAWL - HANYA block BOT mesin pencari/asli,
+      //      JANGAN block in-app browser (WhatsApp/Telegram/Facebook/Instagram)
+      //      karena user nyata sering share link via app tsb.
+      // ============================================================
+      var botPatterns = /googlebot|bingbot|slurp|duckduckbot|yandexbot|baiduspider|facebookexternalhit|facebot|twitterbot|linkedinbot|telegrambot|discordbot|applebot|petalbot|semrushbot|ahrefsbot|mj12bot|dotbot/i;
+      if (botPatterns.test(navigator.userAgent)) {
+        // FIX: jangan blank page (bisa kena user via in-app browser),
+        //      cukup sembunyikan tombol + tampilkan pesan.
+        var g = document.getElementById('btnGroup');
+        if (g) g.style.display = 'none';
+        var main = document.querySelector('main');
+        if (main) {
+          var p = document.createElement('p');
+          p.style.cssText = 'color:#6b6b76;font-size:14px;text-align:center;padding:40px 20px;';
+          p.textContent = 'Please open this page in a regular browser.';
+          main.appendChild(p);
+        }
+        return;
+      }
+
+      var SITE_BASE = (window.VidvastConfig && VidvastConfig.SITE_BASE) || (window.location.origin + '/');
+      var params = new URLSearchParams(window.location.search);
+      var videoId = params.get('id') || '';
+
+      function getSiteNameFromDomain() {
+        var hostname = window.location.hostname || '';
+        hostname = hostname.replace(/^www\./, '');
+        var parts = hostname.split('.');
+        if (parts.length >= 2) {
+          var second = parts[parts.length - 2];
+          var commonTLD2 = ['co','com','net','org','info','biz','me','io','tv','xyz','app','dev','site','online','live','store','shop','cloud','id','uk','us','ca','au','de','fr','jp','kr','br','in'];
+          var domainPart;
+          if (commonTLD2.indexOf(second) !== -1 && parts.length >= 3) {
+            domainPart = parts.slice(0, parts.length - 2).join('.');
+          } else {
+            domainPart = parts.slice(0, parts.length - 1).join('.');
+          }
+          domainPart = domainPart.replace(/(\D+?)\d+$/, '$1');
+          var words = domainPart.split(/[-_.]+/);
+          var name = '';
+          for (var i = 0; i < words.length; i++) {
+            var w = words[i];
+            if (w.length === 0) continue;
+            name += w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            if (i < words.length - 1) name += ' ';
+          }
+          return name || 'Video';
+        }
+        return 'Video';
+      }
+
+      var siteName = getSiteNameFromDomain();
+      document.title = siteName;
+      document.getElementById('siteName').textContent = siteName;
+      document.getElementById('footerName').textContent = siteName;
+      document.getElementById('ogSiteName').setAttribute('content', siteName);
+      document.getElementById('ogTitle').setAttribute('content', siteName + ' — Video Available');
+      document.getElementById('ogDesc').setAttribute('content',
+        'Check out this video on ' + siteName + '. Available in Full HD quality. Watch or download now.'
+      );
+      document.getElementById('ogUrl').setAttribute('content', window.location.href || '');
+
+      if (videoId) {
+        document.getElementById('btnWatchNow').href = SITE_BASE + 'v/?id=' + videoId;
+        document.getElementById('btnDownload').href = SITE_BASE + 'd/?url=' + videoId;
+      }
+
+      // ============================================================
+      // COLOR POOL & BUTTON SHUFFLE
+      // ============================================================
+      var colorPool = [
+        { bg: '#00e676', r: 0,   g: 230, b: 118 },
+        { bg: '#ffab00', r: 255, g: 171, b: 0   },
+        { bg: '#ff3d71', r: 255, g: 61,  b: 113 },
+        { bg: '#00b0ff', r: 0,   g: 176, b: 255 },
+        { bg: '#e040fb', r: 224, g: 64,  b: 251 },
+        { bg: '#ff6e40', r: 255, g: 110, b: 64  },
+        { bg: '#76ff03', r: 118, g: 255, b: 3   },
+        { bg: '#f50057', r: 245, g: 0,   b: 87  },
+        { bg: '#18ffff', r: 24,  g: 255, b: 255 },
+        { bg: '#ffd740', r: 255, g: 215, b: 64  }
+      ];
+      function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+        }
+        return arr;
+      }
+      function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      var group = document.getElementById('btnGroup');
+      var watchNowBtn  = document.getElementById('btnWatchNow');
+      var fullHDBtn    = document.getElementById('btnFullHD');
+      var watchMoreBtn = document.getElementById('btnWatchMore');
+      var downloadBtn  = document.getElementById('btnDownload');
+
+      var lockedPair = [watchNowBtn, fullHDBtn];
+      var freeButtons = shuffle([watchMoreBtn, downloadBtn]);
+      var slots = shuffle([lockedPair, [freeButtons[0]], [freeButtons[1]]]);
+
+      slots.forEach(function (slot) {
+        slot.forEach(function (btn) { group.appendChild(btn); });
+      });
+
+      shuffle(colorPool);
+      var allBtns = Array.from(group.querySelectorAll('.btn'));
+      allBtns.forEach(function (btn, i) {
+        var c = colorPool[i % colorPool.length];
+        btn.style.setProperty('--btn-bg', c.bg);
+        btn.style.setProperty('--btn-sh-rest',   'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.25)');
+        btn.style.setProperty('--btn-sh-hover',  'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.45)');
+        btn.style.setProperty('--btn-sh-active', 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0.3)');
+      });
+
+      allBtns.forEach(function (btn, i) {
+        setTimeout(function () { btn.classList.add('show'); }, 120 + i * 100);
+      });
+
+      group.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn');
+        if (!btn) return;
+        var ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        var rect = btn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', function () { ripple.remove(); });
+      });
+
+      // ============================================================
+      // ONLINE COUNTER (fake)
+      // ============================================================
+      var onlineEl = document.getElementById('onlineNum');
+      var onlineCount = 800 + Math.floor(Math.random() * 500);
+      function updateOnline() {
+        var delta = Math.floor(Math.random() * 14) - 5;
+        onlineCount = Math.max(500, onlineCount + delta);
+        onlineEl.textContent = onlineCount.toLocaleString();
+      }
+      onlineEl.textContent = onlineCount.toLocaleString();
+      (function onlineLoop() {
+        setTimeout(function () { updateOnline(); onlineLoop(); }, 2000 + Math.floor(Math.random() * 1000));
+      })();
+
+      // ============================================================
+      // FAKE NOTIFICATIONS
+      // ============================================================
+      var firstNames = ['James','Sarah','Michael','Emma','David','Olivia','Chris','Emily','Daniel','Sophie','Alex','Jessica','Ryan','Hannah','Lucas','Mia','Ethan','Ava','Noah','Isabella','Liam','Charlotte','Mason','Amelia','Logan','Harper','Oliver','Evelyn','Jack','Abigail','Henry','Ella','Sebastian','Scarlett','William','Grace','Benjamin','Lily','Owen','Chloe','Nathan','Zoey','Caleb','Penelope','Aiden','Nora','Jackson','Riley','Elijah','Layla','Grayson'];
+      var platforms  = ['Facebook Browse','Google Search','WhatsApp Share','Twitter / X','Instagram','Direct Link','Telegram','YouTube Referral','Chrome Suggestion','Facebook Group','Pinterest','LinkedIn','Reddit','Firefox Suggestion','Discord Share'];
+      var actions    = ['is watching now','just joined','is downloading','started watching','just accessed','is streaming'];
+      var timeAgo    = ['just now','1 min ago','2 mins ago','3 mins ago','5 mins ago','7 mins ago'];
+      var avatarColors = ['#4a90d9','#e74c3c','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#3498db','#e84393','#00cec9','#fd79a8','#6c5ce7'];
+
+      var MAX_VISIBLE    = 5;
+      var NOTIF_LIFETIME = 5000;
+      var BUILDUP_DELAY  = 2500;
+      var STEADY_MIN     = 6000;
+      var STEADY_MAX     = 9000;
+
+      var container = document.getElementById('notifContainer');
+      function createNotif() {
+        while (container.children.length >= MAX_VISIBLE) {
+          var oldest = container.lastElementChild;
+          if (oldest) forceDismiss(oldest);
+        }
+        var name  = pickRandom(firstNames);
+        var plat  = pickRandom(platforms);
+        var act   = pickRandom(actions);
+        var time  = pickRandom(timeAgo);
+        var avClr = pickRandom(avatarColors);
+        var init  = name.charAt(0).toUpperCase();
+        var popup = document.createElement('div');
+        popup.classList.add('notif-popup');
+        popup.style.setProperty('--notif-accent', avClr);
+        popup.innerHTML =
+          '<div class="notif-avatar" style="background:' + avClr + '">' + init + '</div>' +
+          '<div class="notif-body">' +
+            '<p class="notif-text"><strong>' + name + '</strong> ' + act + ' via <strong>' + plat + '</strong></p>' +
+            '<span class="notif-time">' + time + '</span>' +
+          '</div>' +
+          '<button class="notif-close" aria-label="Close">&times;</button>';
+        popup.querySelector('.notif-close').addEventListener('click', function () { dismissNotif(popup); });
+        container.prepend(popup);
+        popup._timer = setTimeout(function () { dismissNotif(popup); }, NOTIF_LIFETIME);
+      }
+      function dismissNotif(popup) {
+        if (!popup || popup.classList.contains('removing')) return;
+        clearTimeout(popup._timer);
+        popup.classList.add('removing');
+        popup.addEventListener('animationend', function () { if (popup.parentNode) popup.remove(); });
+      }
+      function forceDismiss(popup) {
+        if (!popup) return;
+        clearTimeout(popup._timer);
+        popup.remove();
+      }
+      var spawnCount = 0;
+      (function buildUpLoop() {
+        createNotif();
+        spawnCount++;
+        if (spawnCount < MAX_VISIBLE) setTimeout(buildUpLoop, BUILDUP_DELAY);
+        else {
+          (function steadyLoop() {
+            setTimeout(function () { createNotif(); steadyLoop(); }, STEADY_MIN + Math.floor(Math.random() * (STEADY_MAX - STEADY_MIN)));
+          })();
+        }
+      })();
+      setTimeout(function(){}, 4000);
+    })();
+  </script>
+
+<script src="https://fundingfashioned.com/6f/e9/1b/6fe91b15e24a8ff385aad31681e8ea4b.js"></script>
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4949382,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+</body>
+</html>

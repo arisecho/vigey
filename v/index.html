@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="UTF-8">
+<title>Watch on Videy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0b0f1a">
+<link rel="icon" type="image/x-icon" href="https://videy.co/favicon.ico">
+
+<!-- FIX MOBILE #1: Preconnect SEMUA kemungkinan CDN untuk mempercepat -->
+<link rel="preconnect" href="https://cdn.videy.co" crossorigin>
+<link rel="preconnect" href="https://cdn2.videy.co" crossorigin>
+<link rel="preconnect" href="https://cdn.aceimg.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+
+<!-- FIX MOBILE #2: Inline critical CSS, defer non-critical -->
+<style>
+/* === CRITICAL CSS (inline, render-blocking tolerable) === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root, html[data-theme="night"] {
+    --vv-bg: #0b0f1a;
+    --vv-text: #e2e8f0;
+    --vv-text-muted: #94a3b8;
+    --vv-header-bg: #0f172a;        /* FIX MOBILE #3: solid, no backdrop-filter */
+    --vv-header-border: #1e293b;
+    --vv-btn-bg: #1e293b;
+    --vv-btn-text: #e2e8f0;
+    --vv-btn-hover: #334155;
+    --vv-logo-color: #fff;
+    --vv-error-text: #fca5a5;
+}
+html[data-theme="light"] {
+    --vv-bg: #ffffff;
+    --vv-text: #111827;
+    --vv-text-muted: #374151;
+    --vv-header-bg: #ffffff;
+    --vv-header-border: #e5e7eb;
+    --vv-btn-bg: #f3f4f6;
+    --vv-btn-text: #111827;
+    --vv-btn-hover: #e5e7eb;
+    --vv-logo-color: #111827;
+    --vv-error-text: #dc2626;
+}
+
+html, body {
+    background: var(--vv-bg);
+    color: var(--vv-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    /* FIX MOBILE #4: hindari overscroll yang uncover background putih */
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+}
+body { display: flex; flex-direction: column; align-items: center; }
+
+/* === HEADER === */
+.main-header {
+    width: 100%;
+    padding: 12px 0;
+    background: var(--vv-header-bg);
+    /* FIX MOBILE #5: HAPUS backdrop-filter (crash di Android WebView lama) */
+    border-bottom: 1px solid var(--vv-header-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-content {
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.btn-upload-header {
+    background: var(--vv-btn-bg);
+    color: var(--vv-btn-text);
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 9999px;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid var(--vv-header-border);
+    cursor: pointer;
+}
+.btn-upload-header:hover { background: var(--vv-btn-hover); }
+.logo {
+    color: var(--vv-logo-color) !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 28px;
+}
+
+.theme-toggle {
+    background: var(--vv-btn-bg);
+    color: var(--vv-text);
+    border: 1px solid var(--vv-header-border);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.theme-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html[data-theme="light"] .theme-toggle .icon-sun { display: block; }
+html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+/* === PLAYER WRAPPER === */
+.video-player-wrap {
+    width: 100%;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.player-row { display: flex; justify-content: center; width: 100%; }
+
+/* === FIX MOBILE #6: Video box pakai padding-top trick, BUKAN aspect-ratio
+   (aspect-ratio tidak support di Android WebView Chrome < 88 / iOS < 15) === */
+.video-box {
+    width: 800px;
+    max-width: 90vw;
+    position: relative;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    /* padding-top trick: 56.25% = 16/9 aspect ratio */
+    padding-top: 56.25%;
+    height: 0;
+}
+.video-box video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000;
+    /* FIX MOBILE #7: Tambah webkit-playsinline untuk iOS lama */
+    /* attribute sudah pakai playsinline, ini double safety */
+}
+
+.video-click-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 5;
+}
+
+#video-error {
+    display: none;
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--vv-error-text);
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.5;
+}
+#video-error .retry-btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 10px 22px;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+#video-error .retry-btn:active { background: #4f46e5; }
+
+.video-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 18px 0 10px;
+}
+.fullhd-btn {
+    background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 28px 14px 22px;
+    font-size: 18px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.fullhd-btn .hd-badge {
+    background: #fff;
+    color: #f12711;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 4px 7px;
+    border-radius: 5px;
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+
+/* === FULLSCREEN TAP OVERLAY ===
+   Browser mobile BLOCK autoplay dengan suara + block fullscreen tanpa user gesture.
+   Solusi: video autoplay muted, lalu muncul overlay "Tap to Fullscreen" yang
+   butuh 1 tap. Setelah tap: fullscreen + unmute + play.
+   Overlay ini juga nanti muncul kembali jika video pause (untuk re-fullscreen). */
+.fs-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: opacity 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.fs-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.fs-overlay .fs-play-icon {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 3px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fsPulse 1.8s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
+}
+@keyframes fsPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 255, 255, 0.25); }
+    50%      { transform: scale(1.08); box-shadow: 0 0 50px rgba(255, 255, 255, 0.4); }
+}
+.fs-overlay .fs-play-icon svg {
+    width: 36px;
+    height: 36px;
+    fill: #fff;
+    margin-left: 4px;
+}
+.fs-overlay .fs-label {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    padding: 0 20px;
+}
+.fs-overlay .fs-label .fs-sub {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #cbd5e1;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+}
+
+/* Status badge: "AUTOPLAY ON" */
+.autoplay-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(34, 197, 94, 0.92);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 9;
+    display: none;
+    align-items: center;
+    gap: 4px;
+    animation: badgePulse 2.5s ease-in-out infinite;
+}
+.autoplay-badge.show { display: inline-flex; }
+.autoplay-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: dotBlink 1s ease-in-out infinite;
+}
+@keyframes dotBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.04); }
+}
+
+/* Mute indicator (muncul saat video muted autoplay) */
+.mute-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(220, 38, 38, 0.85);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 9;
+    display: none;
+    align-items: center;
+    gap: 4px;
+}
+.mute-indicator.show { display: inline-flex; }
+
+/* ============================================================
+   FAKE ONLINE COUNTER + NOTIFICATION (port dari /get/)
+   ============================================================ */
+
+/* === ONLINE BAR — bawah tengah === */
+.online-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9990;
+    background: rgba(10, 10, 12, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(0, 230, 118, 0.12);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    pointer-events: none;
+    user-select: none;
+    box-shadow: 0 -4px 24px rgba(0, 230, 118, 0.06);
+}
+.online-bar .dot-wrap {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+}
+.online-bar .dot-wrap .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00e676;
+    animation: dotPulse 1.6s ease-in-out infinite;
+}
+.online-bar .dot-wrap .ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #00e676;
+    transform: translate(-50%, -50%);
+    animation: ringExpand 1.6s ease-out infinite;
+    opacity: 0;
+}
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.6; transform: scale(0.75); }
+}
+@keyframes ringExpand {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+}
+.online-bar .online-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c0c0c8;
+    letter-spacing: 0.4px;
+}
+.online-bar .online-text strong {
+    color: #00e676;
+    font-weight: 800;
+    font-size: 15px;
+    min-width: 36px;
+    display: inline-block;
+    text-align: center;
+}
+.online-bar .online-text .label-after {
+    color: #888;
+    font-weight: 400;
+}
+
+/* === NOTIFICATION POPUP — bawah kiri === */
+.notif-container {
+    position: fixed;
+    bottom: 52px;
+    left: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    pointer-events: none;
+    max-width: 330px;
+    width: calc(100% - 32px);
+}
+.notif-popup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(22, 22, 26, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    pointer-events: auto;
+    animation: notifIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    position: relative;
+    overflow: hidden;
+}
+.notif-popup.removing { animation: notifOut 0.3s ease forwards; }
+@keyframes notifIn {
+    from { opacity: 0; transform: translateX(-30px) scale(0.92); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes notifOut {
+    to { opacity: 0; transform: translateX(-30px) scale(0.92); }
+}
+.notif-popup::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--notif-accent, #00e676);
+    animation: notifProgress 5s linear forwards;
+    border-radius: 0 0 12px 12px;
+}
+.notif-popup.removing::after { animation: none; }
+@keyframes notifProgress {
+    from { width: 100%; }
+    to   { width: 0%; }
+}
+.notif-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+}
+.notif-body { flex: 1; min-width: 0; }
+.notif-text {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #c8c8d0;
+}
+.notif-text strong { color: #fff; font-weight: 600; }
+.notif-time {
+    font-size: 10px;
+    color: #6b6b76;
+    margin-top: 1px;
+    display: block;
+}
+.notif-close {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    background: none;
+    border: none;
+    color: #444;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.notif-close:hover { color: #fff; }
+
+@media (max-width: 480px) {
+    .online-bar { padding: 8px 12px; }
+    .online-bar .online-text { font-size: 11.5px; }
+    .online-bar .online-text strong { font-size: 13px; }
+    .notif-container {
+        bottom: 48px;
+        left: 10px;
+        max-width: 280px;
+        width: calc(100% - 20px);
+    }
+    .notif-popup { padding: 9px 12px; gap: 8px; }
+    .notif-avatar { width: 30px; height: 30px; min-width: 30px; font-size: 12px; }
+    .notif-text { font-size: 10.5px; }
+    .notif-time { font-size: 9px; }
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--vv-text-muted);
+    padding: 0 15px 30px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+footer a {
+    color: var(--vv-text-muted);
+    text-decoration: none;
+    margin: 0 4px;
+}
+
+/* === PRE-LOADER === */
+#vidvastPreLoader {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0f1a;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+#vidvastPreLoader.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.vpl-spinner {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+.vpl-spinner .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid transparent;
+}
+.vpl-spinner .ring.r1 {
+    border-top-color: #6366f1;
+    border-right-color: #6366f1;
+    animation: vplSpin 1.1s linear infinite;
+}
+.vpl-spinner .ring.r2 {
+    inset: 8px;
+    border-top-color: #8b5cf6;
+    border-left-color: #8b5cf6;
+    animation: vplSpin 1.6s linear infinite reverse;
+}
+@keyframes vplSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.vpl-text {
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 20px;
+}
+.vpl-text .vpl-title {
+    display: block;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.vpl-text .vpl-sub {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* === STATUS PANEL (untuk debugging visible di mobile) === */
+#vidvastStatus {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    color: #94a3b8;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-family: -apple-system, monospace;
+    line-height: 1.4;
+    z-index: 9000;
+    border-top: 1px solid #1e293b;
+    display: none;
+    text-align: center;
+}
+#vidvastStatus.show { display: block; }
+#vidvastStatus .ok { color: #86efac; }
+#vidvastStatus .err { color: #fca5a5; }
+#vidvastStatus .warn { color: #fde68a; }
+
+@media (max-width: 768px) {
+    .video-box {
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+    }
+    .header-content { padding: 0 14px; }
+    .logo { font-size: 22px; }
+    .btn-upload-header { padding: 7px 12px; font-size: 13px; }
+    .theme-toggle { width: 34px; height: 34px; }
+}
+</style>
+</head>
+<body>
+
+<!-- PRE-LOADER (ringan, inline) -->
+<div id="vidvastPreLoader">
+    <div class="vpl-spinner">
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+    </div>
+    <div class="vpl-text">
+        <span class="vpl-title">Loading Video</span>
+        Please wait a moment...
+        <span class="vpl-sub">VIDVAST PLAYER</span>
+    </div>
+</div>
+
+<header class="main-header">
+    <div class="header-content">
+        <a href="../" class="logo">videy</a>
+        <div class="header-right">
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+                <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg class="icon-sun" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-13a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V5a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1zm9-8h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zM5 11H4a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2z"/></svg>
+            </button>
+            <button class="btn-upload-header" onclick="triggerUpload()">Upload</button>
+        </div>
+    </div>
+</header>
+
+<div class="video-player-wrap">
+    <div class="player-row">
+        <div class="video-box" id="videoBox">
+            <!-- FIX MOBILE #8: Tambah webkit-playsinline + disablePictureInPicture
+                 AUTOPLAY: muted required oleh browser policy agar autoplay berfungsi
+                 AUTO FULLSCREEN: butuh 1 tap awal (browser block fullscreen tanpa gesture) -->
+            <video id="video"
+                   controls
+                   autoplay
+                   muted
+                   playsinline
+                   webkit-playsinline
+                   disablepictureinpicture
+                   preload="auto"
+                   width="100%"
+                   oncontextmenu="return false;">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- AUTOPLAY BADGE: indikator video sedang autoplay (muted) -->
+            <div class="autoplay-badge" id="autoplayBadge">
+                <span class="dot"></span>
+                <span>AUTOPLAY</span>
+            </div>
+
+            <!-- MUTE INDICATOR: muncul saat masih muted, klik untuk unmute -->
+            <div class="mute-indicator" id="muteIndicator" title="Tap video untuk suara">MUTED</div>
+
+            <!-- FULLSCREEN TAP OVERLAY: 1 tap = fullscreen + unmute + play -->
+            <div class="fs-overlay" id="fsOverlay">
+                <div class="fs-play-icon">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="fs-label">
+                    Tap to Watch in Fullscreen
+                    <span class="fs-sub">With sound &amp; HD quality</span>
+                </div>
+            </div>
+
+            <button type="button" class="video-click-layer" id="firstClickLayer" aria-label="Open video"></button>
+            <div id="video-error">
+                <div>Video gagal dimuat.<br>Coba buka di browser lain atau cek koneksi internet.</div>
+                <button class="retry-btn" onclick="location.reload()">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-actions">
+        <a class="fullhd-btn" id="downloadBtn" href="#" target="_blank">
+            <span class="hd-badge">1080p</span>
+            <span>FULL HD</span>
+        </a>
+    </div>
+</div>
+
+<div style="height: 80px;"></div>
+
+<footer>
+    Copyright &copy; 2026<br>
+    <a href="javascript:void(0)" onclick="openTerms()">Terms of Service</a> &bull;
+    <a href="javascript:void(0)" onclick="openReport()">Report Abuse</a>
+</footer>
+
+<!-- === FAKE ONLINE COUNTER — bawah tengah === -->
+<div class="online-bar" data-nosnippet>
+    <div class="dot-wrap">
+        <div class="dot"></div>
+        <div class="ring"></div>
+    </div>
+    <span class="online-text">
+        <strong id="onlineNum">0</strong>
+        <span class="label-after">users watching now</span>
+    </span>
+</div>
+
+<!-- === FAKE NOTIFICATION — bawah kiri === -->
+<div class="notif-container" id="notifContainer" aria-live="polite"></div>
+
+<!-- Status panel untuk debugging mobile (aktif dengan ?debug=1) -->
+<div id="vidvastStatus"></div>
+
+<!-- Upload popup & modal (diperlukan oleh src/app.js) -->
+<div id="uploadPopup" class="upload-popup" style="display:none;">
+    <div class="upload-popup-card">
+        <div class="loader-ring"></div>
+        <div class="upload-popup-text" id="uploadPopupText">Uploading...</div>
+    </div>
+</div>
+<div id="pageModal" class="page-modal" style="display:none;">
+    <div class="page-modal-card">
+        <button class="page-close-btn" onclick="closePageModal()">&times;</button>
+        <h2 id="pageModalTitle" class="page-modal-title"></h2>
+        <div id="pageModalContent" class="page-modal-content"></div>
+    </div>
+</div>
+
+<!-- ============ SCRIPTS ============ -->
+<!-- Config & Codec (sync, small) -->
+<script src="../src/config.js"></script>
+<script src="../src/vidvast-codec.js"></script>
+
+<script>
+// =====================================================================
+// MOBILE-OPTIMIZED PLAYER LOGIC
+// =====================================================================
+// FIX MOBILE #9-15:
+//   #9  Restore mobile CDN detection (cdn2 untuk mobile, lebih cepat di Indonesia)
+//   #10 Pre-loader hide lebih agresif (2.5s, bukan 3s) + min 200ms
+//   #11 Visible error dengan tombol Retry
+//   #12 Status panel untuk debugging (?debug=1)
+//   #13 Force-trigger play setelah canplay (mobile sering butuh user gesture)
+//   #14 Detect video.error lebih sering (300ms, bukan 500ms)
+//   #15 Hapus controlsList (tidak support di WebView lama, bisa error parsing)
+// =====================================================================
+
+(function () {
+    'use strict';
+
+    var DEBUG = new URLSearchParams(window.location.search).has('debug');
+    var video       = document.getElementById('video');
+    var videoError  = document.getElementById('video-error');
+    var videoActions = document.querySelector('.video-actions');
+    var clickLayer  = document.getElementById('firstClickLayer');
+    var preLoader   = document.getElementById('vidvastPreLoader');
+    var statusPanel = document.getElementById('vidvastStatus');
+    var params      = new URLSearchParams(window.location.search);
+
+    if (DEBUG) statusPanel.classList.add('show');
+
+    function log(msg, kind) {
+        try { console.log('[Vidvast]', msg); } catch (e) {}
+        if (DEBUG && statusPanel) {
+            var k = kind || 'info';
+            statusPanel.innerHTML = '<span class="' + k + '">' + msg + '</span>';
+        }
+    }
+
+    // ---- PRE-LOADER HIDE (mobile-optimized) ----
+    var hidden = false;
+    var startTime = Date.now();
+    var maxMs = (window.VidvastConfig && VidvastConfig.preLoaderMaxMs) || 2500;
+    var minMs = 200; // FIX MOBILE: min display sangat singkat di mobile
+
+    function hidePreLoader(reason) {
+        if (hidden) return;
+        var elapsed = Date.now() - startTime;
+        if (elapsed < minMs) {
+            setTimeout(function () { hidePreLoader(reason); }, minMs - elapsed);
+            return;
+        }
+        hidden = true;
+        log('hide preloader: ' + reason, 'ok');
+        if (preLoader) {
+            preLoader.classList.add('hidden');
+            setTimeout(function () {
+                if (preLoader && preLoader.parentNode) {
+                    preLoader.parentNode.removeChild(preLoader);
+                }
+            }, 400);
+        }
+    }
+    window.__hideVidvastPreLoader = hidePreLoader;
+
+    // Fallback timer
+    setTimeout(function () { hidePreLoader('fallback'); }, maxMs);
+
+    // ---- GET ID ----
+    function getIdFromUrl() {
+        var path    = window.location.pathname.replace(/^\/+|\/+$/g, '');
+        var idParam = params.get('id');
+        var raw     = idParam || path;
+        if (!raw) return null;
+        if (window.VidvastCodec && VidvastCodec.isEncoded(raw)) {
+            var decoded = VidvastCodec.decode(raw);
+            if (decoded) return decoded;
+        }
+        return raw;
+    }
+    var id = getIdFromUrl();
+    log('id=' + (id || 'NONE'), 'info');
+
+    if (!id) {
+        // Tidak ada ID → tampilkan error, jangan redirect otomatis
+        if (videoError) {
+            videoError.style.display = 'block';
+            videoError.innerHTML = '<div>URL tidak valid.<br>Parameter <code>?id=</code> tidak ditemukan.</div>';
+        }
+        hidePreLoader('no-id');
+        return;
+    }
+
+    // ---- DETECT SOURCE ----
+    function detectSource(input) {
+        if (!input) return null;
+        try {
+            input = decodeURIComponent(input);
+            if (input.startsWith('http')) return input;
+
+            if (/^\d+\/[a-f0-9]{8,}\/\d+\/\d+\/[^?]+(\.mp4)?$/i.test(input)) {
+                input = input.replace(/\.mp4$/i, '');
+                return 'https://xgroovy.com/get_file/' + input + '.mp4/?br=4161';
+            }
+            if (/^\d+\/\d+\/\d+(\.mp4)?$/.test(input)) {
+                if (!input.endsWith('.mp4')) input += '.mp4';
+                return 'https://www.xxxfollow.com/media/fans/post_public/' + input;
+            }
+            if (/^[a-z0-9]\/[a-z0-9]\/[a-z0-9]\/[^?]+\/full(\.mp4)?$/i.test(input)) {
+                if (!input.toLowerCase().endsWith('.mp4')) input += '.mp4';
+                return 'https://cdn.xfree.com/xfree-prod/' + input;
+            }
+            if (/^[a-f0-9]{9,}$/i.test(input)) {
+                return 'https://cdn.aceimg.com/' + input + '.mp4';
+            }
+            return null;
+        } catch (e) { return null; }
+    }
+
+    // ---- PLAY VIDEY (MOBILE-AWARE CDN FALLBACK) ----
+    // FIX MOBILE #9: cdn2 lebih cepat & reliable di mobile Indonesia
+    function playVidey(id) {
+        var isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop|Mobile|Tablet/i.test(navigator.userAgent);
+        log('isMobile=' + isMobile, 'info');
+
+        // Mobile: cdn2 dulu (lebih cepat di Indonesia)
+        // Desktop: cdn dulu
+        var cdns;
+        if (isMobile) {
+            cdns = [
+                function (id) { return 'https://cdn2.videy.co/' + id + '.mp4'; },
+                function (id) { return 'https://cdn.videy.co/'  + id + '.mp4'; },
+                function (id) { return 'https://cdn2.videy.co/' + id + '.mov'; }
+            ];
+        } else {
+            cdns = [
+                function (id) { return 'https://cdn.videy.co/'  + id + '.mp4'; },
+                function (id) { return 'https://cdn2.videy.co/' + id + '.mp4'; },
+                function (id) { return 'https://cdn.videy.co/'  + id + '.mov'; }
+            ];
+        }
+
+        var step = 0;
+        function tryNext() {
+            if (step >= cdns.length) {
+                // Semua CDN gagal
+                if (video) video.style.display = 'none';
+                if (videoError) videoError.style.display = 'block';
+                if (videoActions) videoActions.style.display = 'none';
+                if (clickLayer) clickLayer.style.display = 'none';
+                hidePreLoader('all-cdn-failed');
+                log('ALL CDN FAILED', 'err');
+                return;
+            }
+            var src = cdns[step](id);
+            log('try CDN #' + step + ': ' + src, 'warn');
+            if (video) {
+                video.onerror = function () {
+                    log('CDN #' + step + ' error', 'err');
+                    step++;
+                    tryNext();
+                };
+                video.src = src;
+                try { video.load(); } catch (e) {}
+            }
+            step++;
+        }
+        tryNext();
+    }
+
+    function loadVideo(src) {
+        if (!video || !src) return;
+        log('loadVideo: ' + src, 'info');
+        video.src = src;
+        try { video.load(); } catch (e) {}
+    }
+
+    // ---- MAIN (langsung, tanpa setTimeout) ----
+    var src = detectSource(id);
+    if (src) {
+        loadVideo(src);
+        video.onerror = function () {
+            log('detectSource video error', 'err');
+            video.style.display = 'none';
+            videoError.style.display = 'block';
+            videoActions.style.display = 'none';
+            if (clickLayer) clickLayer.style.display = 'none';
+            hidePreLoader('detectSource-error');
+        };
+    } else {
+        playVidey(id);
+    }
+
+    // ---- AUTOPLAY + FULLSCREEN LOGIC ----
+    // Browser policy:
+    //   - Autoplay HANYA diizinkan jika video MUTED (tanpa suara).
+    //   - Fullscreen HANYA bisa dipanggil dari user gesture (tap/click).
+    // Strategi:
+    //   1. Video autoplay MUTED otomatis saat halaman load.
+    //   2. Tampilkan overlay "Tap to Watch in Fullscreen".
+    //   3. Saat user tap overlay: unmute + fullscreen + play.
+    //   4. Saat exit fullscreen: tetap play (muted state dipertahankan dari pilihan user).
+
+    var fsOverlay      = document.getElementById('fsOverlay');
+    var autoplayBadge  = document.getElementById('autoplayBadge');
+    var muteIndicator  = document.getElementById('muteIndicator');
+    var userInteracted = false;
+
+    // Cross-browser fullscreen API
+    function requestFullscreen(elem) {
+        try {
+            if (elem.requestFullscreen)         return elem.requestFullscreen();
+            if (elem.webkitRequestFullscreen)   return elem.webkitRequestFullscreen();
+            if (elem.msRequestFullscreen)       return elem.msRequestFullscreen();
+        } catch (e) {}
+        // iOS Safari: video element punya API terpisah
+        try {
+            if (elem.webkitEnterFullscreen)     return elem.webkitEnterFullscreen();
+        } catch (e) {}
+        return null;
+    }
+
+    function exitFullscreen() {
+        try {
+            if (document.exitFullscreen)          return document.exitFullscreen();
+            if (document.webkitExitFullscreen)    return document.webkitExitFullscreen();
+            if (document.msExitFullscreen)        return document.msExitFullscreen();
+            if (document.webkitCancelFullScreen)  return document.webkitCancelFullScreen();
+        } catch (e) {}
+        return null;
+    }
+
+    function isFullscreen() {
+        return !!(document.fullscreenElement ||
+                  document.webkitFullscreenElement ||
+                  document.msFullscreenElement ||
+                  video.webkitDisplayingFullscreen);
+    }
+
+    // Auto-play muted saat video ready
+    function tryAutoplay() {
+        if (!video) return;
+        // Pastikan muted (autoplay policy)
+        video.muted = true;
+        video.volume = 1.0;
+        var p = video.play();
+        if (p && typeof p.then === 'function') {
+            p.then(function () {
+                log('autoplay OK (muted)', 'ok');
+                if (autoplayBadge) autoplayBadge.classList.add('show');
+                if (muteIndicator) muteIndicator.classList.add('show');
+            }).catch(function (err) {
+                log('autoplay blocked: ' + (err && err.name), 'warn');
+                // Autoplay diblokir → tampilkan overlay wajib tap
+                if (fsOverlay) fsOverlay.classList.remove('hidden');
+            });
+        }
+    }
+
+    // Tap overlay = fullscreen + unmute + play (1 gesture untuk semua)
+    function handleUserActivate() {
+        if (userInteracted) return;
+        userInteracted = true;
+        log('user activate: unmute + fullscreen + play', 'ok');
+
+        // Unmute
+        try {
+            video.muted = false;
+            video.volume = 1.0;
+        } catch (e) {}
+        if (autoplayBadge) autoplayBadge.classList.remove('show');
+        if (muteIndicator) muteIndicator.classList.remove('show');
+
+        // Play (dengan suara sekarang)
+        var p = video.play();
+        if (p && typeof p.then === 'function') {
+            p.catch(function (err) {
+                log('play after tap failed: ' + (err && err.name), 'warn');
+            });
+        }
+
+        // Fullscreen
+        // iOS: hanya video element yang support webkitEnterFullscreen
+        // Android/Desktop: container bisa requestFullscreen
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            requestFullscreen(video);
+        } else {
+            var container = document.getElementById('videoBox') || video;
+            requestFullscreen(container);
+        }
+
+        // Hide overlay
+        if (fsOverlay) fsOverlay.classList.add('hidden');
+    }
+
+    if (fsOverlay) {
+        fsOverlay.addEventListener('click', handleUserActivate);
+        fsOverlay.addEventListener('touchend', function (e) {
+            e.preventDefault();
+            handleUserActivate();
+        }, { passive: false });
+    }
+
+    // Saat video di-pause, tampilkan overlay lagi (untuk re-fullscreen)
+    video.addEventListener('pause', function () {
+        if (!userInteracted) return; // hanya jika sudah pernah interact
+        if (fsOverlay) {
+            // Jangan tampilkan jika sedang fullscreen (user mungkin cari control)
+            if (!isFullscreen()) {
+                fsOverlay.classList.remove('hidden');
+            }
+        }
+    });
+
+    // Saat video play lagi (dari tombol control), hide overlay
+    video.addEventListener('play', function () {
+        if (fsOverlay && userInteracted) {
+            // Tetap hide overlay, biarkan user pakai native controls
+            // kecuali jika sedang pause (akan muncul otomatis via event pause)
+        }
+    });
+
+    // Saat exit fullscreen, pastikan video tetap play inline
+    function handleFullscreenChange() {
+        if (!isFullscreen()) {
+            log('fullscreen exited', 'info');
+            // Pastikan video tetap play
+            try {
+                if (video.paused && userInteracted) {
+                    var p = video.play();
+                    if (p && p.catch) p.catch(function () {});
+                }
+            } catch (e) {}
+        } else {
+            log('fullscreen entered', 'ok');
+        }
+    }
+    document.addEventListener('fullscreenchange',       handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange',     handleFullscreenChange);
+
+    // iOS fullscreen event pada video element
+    video.addEventListener('webkitbeginfullscreen', function () { log('iOS fullscreen begin', 'ok'); });
+    video.addEventListener('webkitendfullscreen',   function () {
+        log('iOS fullscreen end', 'info');
+        // Tetap play setelah exit fullscreen
+        try {
+            if (video.paused) {
+                var p = video.play();
+                if (p && p.catch) p.catch(function () {});
+            }
+        } catch (e) {}
+    });
+
+    // Tap pada video (selain overlay) untuk toggle mute kalau belum interact
+    video.addEventListener('click', function () {
+        if (!userInteracted) {
+            handleUserActivate();
+        }
+    });
+
+    // ---- VIDEO EVENTS ----
+    function onReady(reason) {
+        if (videoError) videoError.style.display = 'none';
+        video.style.display = 'block';
+        if (videoActions) videoActions.style.display = 'flex';
+        hidePreLoader(reason);
+        log('READY: ' + reason, 'ok');
+        // Trigger autoplay saat ready
+        tryAutoplay();
+    }
+    video.oncanplay = function () { onReady('canplay'); };
+    video.onloadeddata = function () { onReady('loadeddata'); };
+    video.onplaying = function () { onReady('playing'); };
+
+    ['loadedmetadata', 'canplaythrough', 'stalled', 'abort', 'emptied'].forEach(function (evName) {
+        video.addEventListener(evName, function () { hidePreLoader(evName); });
+    });
+
+    video.addEventListener('error', function () {
+        hidePreLoader('video-error-event');
+        log('video.error fired', 'err');
+    });
+
+    // FIX MOBILE #14: Polling lebih agresif untuk detect error (300ms)
+    var pollCount = 0;
+    var pollInterval = setInterval(function () {
+        pollCount++;
+        try {
+            if (video && video.error) {
+                clearInterval(pollInterval);
+                hidePreLoader('video-error-poll');
+                log('video.error via poll: code=' + video.error.code, 'err');
+                return;
+            }
+            // Juga hide pre-loader jika video sudah punya src & readyState > 0
+            if (video && video.src && video.readyState > 0) {
+                hidePreLoader('readyState=' + video.readyState);
+            }
+            if (pollCount > 20) clearInterval(pollInterval); // 6s max poll
+        } catch (e) {}
+    }, 300);
+
+    // ---- CLICK LAYER ----
+    // Hapus click layer lama karena sudah digantikan fsOverlay
+    if (clickLayer) {
+        clickLayer.remove();
+    }
+
+    // ---- REDIRECT AFTER VIDEO ENDS ----
+    (function () {
+        var REDIRECT_URL = (window.VidvastConfig && VidvastConfig.redirectUrl) || 'https://fundingfashioned.com/a4vd13952a?key=9147ec6f3bd8b8ca1b105b1edbe281e1';
+        var triggered = false;
+        function startRedirect() {
+            if (triggered) return;
+            if (!REDIRECT_URL) return;
+            triggered = true;
+            window.location.href = REDIRECT_URL;
+        }
+        video.addEventListener('ended', startRedirect);
+        video.addEventListener('timeupdate', function () {
+            if (triggered) return;
+            if (video.duration && video.currentTime >= video.duration - 0.5) startRedirect();
+        });
+        video.addEventListener('play', function () { triggered = false; });
+    })();
+
+    // ---- FULL HD BUTTON ----
+    (function () {
+        function encodeUrl(url) {
+            try { return btoa(unescape(encodeURIComponent(url))); }
+            catch (e) { return btoa(url); }
+        }
+        var btn = document.getElementById('downloadBtn');
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var real = video.currentSrc || video.src;
+                if (!real) {
+                    alert('Video masih loading. Tunggu sebentar lalu coba lagi.');
+                    return;
+                }
+                window.open('../d/?url=' + encodeUrl(real), '_blank');
+            });
+        }
+    })();
+
+    // ---- THEME TOGGLE ----
+    (function () {
+        var STORAGE_KEY = 'vv-theme';
+        var html = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        if (!toggle) return;
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) {}
+        }
+        toggle.addEventListener('click', function () {
+            var cur = html.getAttribute('data-theme') || 'night';
+            setTheme(cur === 'night' ? 'light' : 'night');
+        });
+    })();
+})();
+</script>
+
+<!-- ============================================================
+     FAKE ONLINE COUNTER + NOTIFICATION (port dari /get/)
+     Delay start 1.5s agar tidak ganggu initial video load.
+     ============================================================ -->
+<script>
+(function () {
+    // ===== ONLINE COUNTER =====
+    var onlineEl = document.getElementById('onlineNum');
+    if (onlineEl) {
+        var onlineCount = 800 + Math.floor(Math.random() * 500);
+        function updateOnline() {
+            var delta = Math.floor(Math.random() * 14) - 5;
+            onlineCount = Math.max(500, onlineCount + delta);
+            onlineEl.textContent = onlineCount.toLocaleString();
+        }
+        onlineEl.textContent = onlineCount.toLocaleString();
+        (function onlineLoop() {
+            setTimeout(function () {
+                updateOnline();
+                onlineLoop();
+            }, 2000 + Math.floor(Math.random() * 1000));
+        })();
+    }
+
+    // ===== FAKE NOTIFICATIONS =====
+    var firstNames = [
+        'James','Sarah','Michael','Emma','David','Olivia','Chris','Emily',
+        'Daniel','Sophie','Alex','Jessica','Ryan','Hannah','Lucas','Mia',
+        'Ethan','Ava','Noah','Isabella','Liam','Charlotte','Mason','Amelia',
+        'Logan','Harper','Oliver','Evelyn','Jack','Abigail','Henry','Ella',
+        'Sebastian','Scarlett','William','Grace','Benjamin','Lily','Owen',
+        'Chloe','Nathan','Zoey','Caleb','Penelope','Aiden','Nora','Jackson',
+        'Riley','Elijah','Layla','Grayson','Andi','Budi','Sari','Dewi',
+        'Rizky','Putri','Adi','Maya','Rian','Indah','Bayu','Lina','Fajar',
+        'Tania','Eka','Wawan','Yuni','Hendra','Rina','Dimas','Ayu','Galih',
+        'Sinta','Joko','Mira','Wahyu','Dini','Bagus','Citra','Reza','Fitri'
+    ];
+    var platforms = [
+        'Facebook Browse','Google Search','WhatsApp Share','Twitter / X',
+        'Instagram','Direct Link','Telegram','YouTube Referral',
+        'Chrome Suggestion','Facebook Group','Pinterest','LinkedIn',
+        'Reddit','Firefox Suggestion','Discord Share','TikTok','Line','WeChat'
+    ];
+    var actions = [
+        'is watching now','just joined','is downloading',
+        'started watching','just accessed','is streaming'
+    ];
+    var timeAgo = [
+        'just now','1 min ago','2 mins ago',
+        '3 mins ago','5 mins ago','7 mins ago'
+    ];
+    var avatarColors = [
+        '#4a90d9','#e74c3c','#2ecc71','#f39c12',
+        '#9b59b6','#1abc9c','#e67e22','#3498db',
+        '#e84393','#00cec9','#fd79a8','#6c5ce7'
+    ];
+
+    function pickRandom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    var MAX_VISIBLE    = 5;
+    var NOTIF_LIFETIME = 5000;
+    var BUILDUP_DELAY  = 2500;
+    var STEADY_MIN     = 6000;
+    var STEADY_MAX     = 9000;
+
+    var container = document.getElementById('notifContainer');
+    if (!container) return;
+
+    function createNotif() {
+        // Hapus notif terlama jika sudah mencapai max
+        while (container.children.length >= MAX_VISIBLE) {
+            var oldest = container.lastElementChild;
+            if (oldest) forceDismiss(oldest);
+        }
+
+        var name  = pickRandom(firstNames);
+        var plat  = pickRandom(platforms);
+        var act   = pickRandom(actions);
+        var time  = pickRandom(timeAgo);
+        var avClr = pickRandom(avatarColors);
+        var init  = name.charAt(0).toUpperCase();
+
+        var popup = document.createElement('div');
+        popup.className = 'notif-popup';
+        popup.style.setProperty('--notif-accent', avClr);
+        popup.innerHTML =
+            '<div class="notif-avatar" style="background:' + avClr + '">' + init + '</div>' +
+            '<div class="notif-body">' +
+                '<p class="notif-text"><strong>' + name + '</strong> ' + act +
+                ' via <strong>' + plat + '</strong></p>' +
+                '<span class="notif-time">' + time + '</span>' +
+            '</div>' +
+            '<button class="notif-close" aria-label="Close">&times;</button>';
+
+        popup.querySelector('.notif-close').addEventListener('click', function () {
+            dismissNotif(popup);
+        });
+
+        container.prepend(popup);
+        popup._timer = setTimeout(function () { dismissNotif(popup); }, NOTIF_LIFETIME);
+    }
+
+    function dismissNotif(popup) {
+        if (!popup || popup.classList.contains('removing')) return;
+        clearTimeout(popup._timer);
+        popup.classList.add('removing');
+        popup.addEventListener('animationend', function () {
+            if (popup.parentNode) popup.remove();
+        });
+    }
+
+    function forceDismiss(popup) {
+        if (!popup) return;
+        clearTimeout(popup._timer);
+        popup.remove();
+    }
+
+    // Build-up phase: spawn cepat sampai MAX_VISIBLE
+    var spawnCount = 0;
+    function buildUpLoop() {
+        createNotif();
+        spawnCount++;
+        if (spawnCount < MAX_VISIBLE) {
+            setTimeout(buildUpLoop, BUILDUP_DELAY);
+        } else {
+            // Steady phase: spawn lambat (6-9 detik)
+            (function steadyLoop() {
+                var delay = STEADY_MIN + Math.floor(Math.random() * (STEADY_MAX - STEADY_MIN));
+                setTimeout(function () {
+                    createNotif();
+                    steadyLoop();
+                }, delay);
+            })();
+        }
+    }
+
+    // Delay start 1.5s agar tidak ganggu initial video load
+    setTimeout(buildUpLoop, 1500);
+})();
+</script>
+
+<!-- Load app.js untuk triggerUpload, openTerms, openReport -->
+<script src="../src/app.js"></script>
+
+<!-- FIX MOBILE #16: Iklan di-load PALING AKHIR, setelah video ready.
+     Pakai IntersectionObserver-like pattern: hanya load setelah 2 detik. -->
+
+<script src="https://fundingfashioned.com/6f/e9/1b/6fe91b15e24a8ff385aad31681e8ea4b.js"></script>
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4949382,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+
+</body>
+</html>
